@@ -31,6 +31,16 @@ __al_temp_arr[1] = cap;\
 __al_temp_arr[2] = element_size;\
 (ARRAY) = (TYPE *)(__al_temp_arr+3)
 
+#define array_capacity(ARRAY) *(((size_t *)(ARRAY))-2)
+#define array_length(ARRAY) *(((size_t *)(ARRAY))-3)
+
+#define array_push(ARRAY, VALUE) \
+(ARRAY) = preprocess_al_push(ARRAY);\
+(ARRAY)[array_length(ARRAY)] = (VALUE);\
+size_t *temp = (size_t *)(ARRAY);\
+temp = temp-3;\
+temp[0] += 1
+
 void destroy_array(void *array)
 {
     free(((size_t *)array)-3);
@@ -52,21 +62,14 @@ void *preprocess_al_push(void *array)
 
         //Copy the old elements
         memcpy((void *)(new_arr+3), array, arr[0]*arr[2]);
+	printf("ARRAY ADDR: %x\n", array);
+	printf("ARRAY2 ADDR: %x\n", (new_arr+3));
+	free(array);
+	array = NULL;
         return (void *)(new_arr+3);
     }
     return array;
 }
-
-#define array_capacity(ARRAY) *(((size_t *)(ARRAY))-2)
-#define array_length(ARRAY) *(((size_t *)(ARRAY))-3)
-
-
-#define array_push(ARRAY, VALUE) \
-preprocess_al_push(ARRAY);\
-(ARRAY)[array_length(ARRAY)] = (VALUE);\
-size_t *temp = (size_t *)(ARRAY);\
-temp = temp-3;\
-temp[0] += 1
 
 int main2(void)
 {
@@ -74,7 +77,7 @@ int main2(void)
     init_array(int, array);
     for(int i = 0; i < 100; i++)
     {
-        array = array_push(array, i);
+        array_push(array, i);
         printf("Array Capacity: %zu, Array Size: %zu, Item at %d: %d\n", array_capacity(array), array_length(array),
                                                                                   i, array[i]);
     }
@@ -84,6 +87,6 @@ int main2(void)
 
 int main(int argc, char **argv)
 {
-    main1();
+    //main1();
     main2();
 }
