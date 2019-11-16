@@ -15,6 +15,10 @@ int main(void)
         printf("Array Size: %zu, ", arraylist_length(array));
         printf("Item at %d: %s\n", i, arraylist_get(array, i));
     }
+    for(int i = 0; i < arraylist_length(array); i++)
+    {
+        free(arraylist_get(array, i));
+    }
     char *test_str = "What The Fuck?\0";
     for(int i = -2; i < 3; i++)
     {
