@@ -4,7 +4,7 @@ project(EmberLib C)
 set(CMAKE_C_STANDARD 11)
 
 set(SOURCE src/main.c
-           include/arraylist.h)
+        include/arraylist_old.h include/arraylist_new.h)
 
 add_executable(EmberLib ${SOURCE})
 
