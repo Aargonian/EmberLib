@@ -35,7 +35,7 @@ __al_temp_arr[2] = element_size;\
 #define array_length(ARRAY) *(((size_t *)(ARRAY))-3)
 
 #define array_push(ARRAY, VALUE) \
-(ARRAY) = preprocess_al_push(ARRAY);\
+ARRAY = preprocess_al_push(ARRAY);\
 (ARRAY)[array_length(ARRAY)] = (VALUE);\
 size_t *temp = (size_t *)(ARRAY);\
 temp = temp-3;\
@@ -62,10 +62,9 @@ void *preprocess_al_push(void *array)
 
         //Copy the old elements
         memcpy((void *)(new_arr+3), array, arr[0]*arr[2]);
-	printf("ARRAY ADDR: %x\n", array);
-	printf("ARRAY2 ADDR: %x\n", (new_arr+3));
-	free(array);
-	array = NULL;
+
+        //Free the old data
+        free(arr);
         return (void *)(new_arr+3);
     }
     return array;
