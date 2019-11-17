@@ -22,27 +22,27 @@ unsigned long long my_pow(int base, int power)
 
 int main(void)
 {
-    vec4 **array = init_arraylist(vec4 *);
-    for(int i = 0; i < 100; i++)
+    char ***file_list = init_arraylist(char **);
+    char **file = init_arraylist(char *);
+    for(char c = 32; c < 97+26; c++)
     {
-        vec4 *b = malloc(sizeof(vec4));
-        b->x = i;
-        b->y = i*2;
-        b->z = i*i;
-        b->w = my_pow(i, i);
-
-        arraylist_push(array, b);
-        vec4 *z = arraylist_get(array, i);
-        printf("Vec4 at %d: [%llu, %llu, %llu, %llu]\n", i, z->x, z->y, z->z, z->w);
-        printf("Memory Footprint: %zu\n", arraylist_memory_footprint(array));
+        char *str = malloc(sizeof(char)*2);
+        str[0] = c;
+        str[1] = '\0';
+        arraylist_push(file, str);
     }
-    printf("Information of Note:\n");
-    printf("Size Of Vec4: %zu\n", sizeof(vec4));
-    printf("Size of Pointer To Vec4: %zu\n", sizeof(vec4 *));
-    printf("Size Of Size_T: %zu\n", sizeof(size_t));
-    printf("Size if we just use pointers: %zu\n", sizeof(vec4 *)*arraylist_length(array) + sizeof(size_t)*3);
-    printf("Size if we use struct: %zu\n", sizeof(vec4)*arraylist_length(array) + sizeof(size_t)*3);
-    arraylist_free_all(array);
-    destroy_arraylist(array);
+    arraylist_push(file_list, file);
+    for(size_t i = 0; i < arraylist_length(file_list); i++)
+    {
+        printf("Printing the Contents of File: %zu\n", i);
+        printf("--------------------------------\n");
+        for(size_t j = 0; j < arraylist_length(file_list[i]); j++)
+        {
+            printf("Line %03zu: %s\n", j, file_list[i][j]);
+        }
+        arraylist_free_all(file_list[i]);
+        destroy_arraylist(file_list[i]);
+    }
+    destroy_arraylist(file_list);
     return 0;
 }
