@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define DEFAULT_CAPACITY 16
+#define DEFAULT_CAPACITY 1
 
 #define create_arraylist_type(TYPE) \
 typedef struct array_of_##TYPE{\

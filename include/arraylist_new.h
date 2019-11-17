@@ -11,6 +11,7 @@
 
 /* Function Definitions */
 void *__preprocess_al_push(void *arraylist);
+void *__create_generic_array(size_t element_size, size_t elements);
 
 /*
  * Small utility macros for the other macros, plus the error definitions
@@ -24,24 +25,8 @@ int arraylist_err = 0;
 #define AL_ERR_OUT_OF_BOUNDS 1
 #define clear_arraylist_err() arraylist_err = 0;
 
-/*
- * We encapsulate this macro in a false do/while loop so that the variable names are hidden from any outside scope. This
- * should prevent any name clashes.
- */
-#define init_arraylist_with_capacity(TYPE, ARRAY, CAPACITY)\
-do {\
-    size_t __al_len = 0;\
-    size_t __al_cap = CAPACITY;\
-    size_t __al_element_size = sizeof(TYPE);\
-    size_t *__al_temp_arr = malloc(sizeof(size_t) * 3 + __al_element_size * __al_cap);\
-    __al_temp_arr[0] = __al_len;\
-    __al_temp_arr[1] = __al_cap;\
-    __al_temp_arr[2] = __al_element_size;\
-    (ARRAY) = (TYPE *)(__al_temp_arr+3);\
-    memset(ARRAY, 0, __al_element_size*__al_cap);\
-} while(0)
-
-#define init_arraylist(TYPE, ARRAY) init_arraylist_with_capacity(TYPE, ARRAY, ARRAYLIST_DEFAULT_CAPACITY)
+#define init_arraylist_with_capacity(TYPE, ARRAY, CAPACITY) (TYPE *)__create_generic_array(sizeof(TYPE), CAPACITY)
+#define init_arraylist(TYPE) init_arraylist_with_capacity(TYPE, ARRAY, ARRAYLIST_DEFAULT_CAPACITY)
 
 #define arraylist_push(ARRAY, VALUE) \
 do {\
@@ -63,7 +48,7 @@ do {\
 } while(0)
 
 #define arraylist_get(ARRAY, INDEX) \
-    (((size_t)(INDEX) < 0 || (size_t)(INDEX) >= arraylist_length(ARRAY)) ? NULL : ARRAY[INDEX])
+    (((size_t)(INDEX) < 0 || (size_t)(INDEX) >= arraylist_length(ARRAY)) ? ARRAY[0] : ARRAY[INDEX])
 
 void destroy_arraylist(void *array)
 {
@@ -92,6 +77,17 @@ void *__preprocess_al_push(void *array)
         return (void *)(new_arr+3);
     }
     return array;
+}
+
+void *__create_generic_array(size_t element_size, size_t elements)
+{
+    size_t size = element_size * elements + sizeof(size_t) * 3;
+    size_t *new_arr = malloc(size);
+    new_arr[0] = 0;
+    new_arr[1] = elements;
+    new_arr[2] = element_size;
+    memset(new_arr + 3, 0, size - 3 * sizeof(size_t));
+    return (void *) (new_arr + 3);
 }
 
 #endif //EMBERLIB_ARRAYLIST_NEW_H
