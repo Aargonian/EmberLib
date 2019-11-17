@@ -47,6 +47,18 @@ do {\
     }\
 } while(0)
 
+#define arraylist_free_all(ARRAY) \
+do {\
+    size_t len = arraylist_length(ARRAY);\
+    for(size_t i = 0; i < len; i++)\
+    {\
+        if(ARRAY[i]) \
+        {\
+            free(ARRAY[i]);\
+        }\
+    }\
+} while(0)
+
 #define arraylist_get(ARRAY, INDEX) \
     (((size_t)(INDEX) < 0 || (size_t)(INDEX) >= arraylist_length(ARRAY)) ? ARRAY[0] : ARRAY[INDEX])
 

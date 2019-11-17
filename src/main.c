@@ -42,6 +42,7 @@ int main(void)
     printf("Size Of Size_T: %zu\n", sizeof(size_t));
     printf("Size if we just use pointers: %zu\n", sizeof(vec4 *)*arraylist_length(array) + sizeof(size_t)*3);
     printf("Size if we use struct: %zu\n", sizeof(vec4)*arraylist_length(array) + sizeof(size_t)*3);
+    arraylist_free_all(array);
     destroy_arraylist(array);
     return 0;
 }
