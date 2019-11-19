@@ -10,6 +10,8 @@
 #define ARRAYLIST_DEFAULT_CAPACITY 1
 
 /* Function Definitions */
+int __al_check_bounds(size_t index, size_t max);
+void __al_destroy_arraylist(void *array);
 void *__preprocess_al_push(void *arraylist);
 void *__create_generic_array(size_t element_size, size_t elements);
 
@@ -49,44 +51,58 @@ do {\
 
 #define arraylist_free_all(ARRAY) \
 do {\
-    size_t len = arraylist_length(ARRAY);\
-    for(size_t i = 0; i < len; i++)\
+    size_t __al_len = arraylist_length(ARRAY);\
+    for(size_t __al_i = 0; __al_i < __al_len; __al_i++)\
     {\
-        if(ARRAY[i]) \
+        if(ARRAY[__al_i]) \
         {\
-            free(ARRAY[i]);\
+            free(ARRAY[__al_i]);\
         }\
     }\
 } while(0)
 
-#define arraylist_get(ARRAY, INDEX) \
-    (((size_t)(INDEX) < 0 || (size_t)(INDEX) >= arraylist_length(ARRAY)) ? ARRAY[0] : ARRAY[INDEX])
+#define arraylist_get(ARRAY, INDEX, DEFAULT_VAL)\
+(__al_check_bounds(INDEX, arraylist_length(ARRAY)) ? ARRAY[INDEX] : DEFAULT_VAL)
 
-void destroy_arraylist(void *array)
+#define destroy_arraylist(ARRAY)\
+__al_destroy_arraylist(ARRAY);\
+ARRAY = NULL;
+
+void __al_destroy_arraylist(void *array)
 {
-    free(((size_t *)array)-3);
+    free(((size_t *) array) - 3);
+}
+
+int __al_check_bounds(size_t index, size_t max)
+{
+    if(index < 0 || index >= max)
+    {
+        arraylist_err = AL_ERR_OUT_OF_BOUNDS;
+        return 0;
+    }
+    return 1;
 }
 
 void *__preprocess_al_push(void *array)
 {
-    size_t *arr = (size_t *)(array);
-    arr = arr-3;
+    size_t *arr = (size_t *) (array);
+    arr = arr - 3;
     if(arr[0] == arr[1])
     {
         //Double the array size you maggot
         arr[1] *= 2;
-        size_t new_size = arr[2]*arr[1] + sizeof(size_t)*3;
+        size_t new_size = arr[2] * arr[1] + sizeof(size_t) * 3;
         size_t *new_arr = malloc(new_size);
         new_arr[0] = arr[0];
         new_arr[1] = arr[1];
         new_arr[2] = arr[2];
 
         //Copy the old elements
-        memcpy((void *)(new_arr+3), array, arr[0]*arr[2]);
+        memcpy((void *) (new_arr + 3), array, arr[0] * arr[2]);
 
         //Free the old data
         free(arr);
-        return (void *)(new_arr+3);
+        return (void *) (new_arr + 3);
     }
     return array;
 }

@@ -22,27 +22,26 @@ unsigned long long my_pow(int base, int power)
 
 int main(void)
 {
-    char ***file_list = init_arraylist(char **);
-    char **file = init_arraylist(char *);
-    for(char c = 32; c < 97+26; c++)
+    int *array = init_arraylist(int);
+    for(size_t i = 0; i < 100; i++)
     {
-        char *str = malloc(sizeof(char)*2);
-        str[0] = c;
-        str[1] = '\0';
-        arraylist_push(file, str);
-    }
-    arraylist_push(file_list, file);
-    for(size_t i = 0; i < arraylist_length(file_list); i++)
-    {
-        printf("Printing the Contents of File: %zu\n", i);
-        printf("--------------------------------\n");
-        for(size_t j = 0; j < arraylist_length(file_list[i]); j++)
+        arraylist_push(array, i);
+        if(arraylist_err)
         {
-            printf("Line %03zu: %s\n", j, file_list[i][j]);
+            printf("ArrayList Error Found: %d\n", arraylist_err);
+            printf("Attempted to access: %zu\n", i);
+            clear_arraylist_err()
         }
-        arraylist_free_all(file_list[i]);
-        destroy_arraylist(file_list[i]);
     }
-    destroy_arraylist(file_list);
-    return 0;
+    for(size_t i = 0; i < 105; i++)
+    {
+        printf("ArrayList Value At %zu: %d\n", i, arraylist_get(array, i, -1));
+        if(arraylist_err)
+        {
+            printf("ArrayList Error Found: %d\n", arraylist_err);
+            printf("Attempted to access: %zu\n", i);
+            clear_arraylist_err()
+        }
+    }
+    destroy_arraylist(array);
 }
