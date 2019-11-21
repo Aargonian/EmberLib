@@ -39,6 +39,9 @@ do {\
     __al_temp[0] += 1;\
 } while(0)
 
+#define arraylist_pop(ARRAY)\
+__typeof__(ARRAY) i;
+
 #define arraylist_set(ARRAY, INDEX, VALUE) \
 do {\
     size_t __i = (size_t)INDEX;\
@@ -66,7 +69,7 @@ do {\
 
 #define destroy_arraylist(ARRAY)\
 __al_destroy_arraylist(ARRAY);\
-ARRAY = NULL;
+ARRAY = NULL
 
 void __al_destroy_arraylist(void *array)
 {
@@ -75,7 +78,7 @@ void __al_destroy_arraylist(void *array)
 
 int __al_check_bounds(size_t index, size_t max)
 {
-    if(index < 0 || index >= max)
+    if(index >= max)
     {
         arraylist_err = AL_ERR_OUT_OF_BOUNDS;
         return 0;

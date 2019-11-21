@@ -9,3 +9,7 @@ set(SOURCE src/main.c
 add_executable(EmberLib ${SOURCE})
 
 target_include_directories(EmberLib PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+if(NOT CXX_COMPILER_ID:MSVC)
+    target_compile_options(EmberLib PRIVATE -Werror -Wall -Wextra)
+endif(NOT CXX_COMPILER_ID:MSVC)
