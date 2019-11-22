@@ -1,15 +1,46 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 project(EmberLib C)
-
 set(CMAKE_C_STANDARD 11)
 
-set(SOURCE src/main.c
-        include/arraylist_old.h include/arraylist_new.h)
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-add_executable(EmberLib ${SOURCE})
+include(CheckCSourceCompiles)
+include(CheckCSourceRuns)
+include(CheckFunctionExists)
+include(CheckIncludeFile)
+include(CheckLibraryExists)
+include(CheckSymbolExists)
+include(CheckTypeSize)
 
-target_include_directories(EmberLib PRIVATE ${CMAKE_SOURCE_DIR}/include)
+# Check Headers
+set(INCLUDES "")
+macro(ck_check_include_file header var)
+	check_include_file("${INCLUDES};${header}" ${var})
+	if(${var})
+		set(INCLUDES ${INCLUDES} ${header})
+	endif(${var})
+endmacro(ck_check_include_file)
 
-if(NOT CXX_COMPILER_ID:MSVC)
-    target_compile_options(EmberLib PRIVATE -Werror -Wall -Wextra)
-endif(NOT CXX_COMPILER_ID:MSVC)
+ck_check_include_file("stdlib.h" HAVE_STDLIB_H)
+check_type_size(intmax_t INTMAX_T)
+check_type_size(uintmax_t UINTMMAX_T)
+
+check_type_size(pid_t PID_T)
+if(NOT HAVE_PID_T)
+	if(WIN32)
+		set(pid_t "int")
+	else(WIN32)
+		MESSAGE(FATAL_ERROR "pid_t doesn't exist on this platform?")
+	endif(WIN32)
+endif(NOT HAVE_PID_T)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+add_definitions(-DHAVE_CONFIG_H)
+set(CONFIG_HEADER ${CMAKE_CURRENT_BINARY_DIR/config.h})
+
+add_subdirectory(EmberLib)
+add_subdirectory(tests)
+
+enable_testing()
+add_test(NAME check_emberlib COMMAND check_emberlib)
