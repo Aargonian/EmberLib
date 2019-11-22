@@ -8,9 +8,9 @@ START_TEST(test_arraylist_int_create_destroy)
 	int *array = NULL;
 	array = init_arraylist(int);
 	ck_assert_ptr_nonnull(array);
-	ck_assert_uint_eq(arraylist_length(array), 100);
-	ck_assert_uint_eq(arraylist_capacity(array), 2);
-	ck_assert_uint_eq(arraylist_memory_footprint(array), 2+expected_size);
+	ck_assert_uint_eq(arraylist_length(array), 0);
+	ck_assert_uint_eq(arraylist_capacity(array), 1);
+	ck_assert_uint_eq(arraylist_memory_footprint(array), expected_size);
 
 	destroy_arraylist(array);
 	ck_assert_ptr_null(array);
