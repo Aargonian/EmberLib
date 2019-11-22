@@ -27,8 +27,8 @@ int arraylist_err = 0;
 #define AL_ERR_OUT_OF_BOUNDS 1
 #define clear_arraylist_err() arraylist_err = 0;
 
-#define init_arraylist_with_capacity(TYPE, ARRAY, CAPACITY) (TYPE *)__create_generic_array(sizeof(TYPE), CAPACITY)
-#define init_arraylist(TYPE) init_arraylist_with_capacity(TYPE, ARRAY, ARRAYLIST_DEFAULT_CAPACITY)
+#define init_arraylist_with_capacity(TYPE, CAPACITY) (TYPE *)__create_generic_array(sizeof(TYPE), CAPACITY)
+#define init_arraylist(TYPE) init_arraylist_with_capacity(TYPE, ARRAYLIST_DEFAULT_CAPACITY)
 
 #define arraylist_push(ARRAY, VALUE) \
 do {\
