@@ -118,6 +118,48 @@ START_TEST(test_arraylist_struct_capacity_create_destroy)
 }
 END_TEST
 
+START_TEST(test_arraylist_int_push)
+{
+    int *array;
+    const int SINGLE_PUSH_TEST_VALUE = 1;
+    const int SINGLE_PUSH_TEST_VALUE_2 = 2;
+    const int SINGLE_PUSH_TEST_VALUE_3 = 3;
+    const int MULTI_PUSH_TEST_VALUES[] = { 1, 2, 3, 4, 5, 6 };
+    const size_t MULTI_PUSH_LEN = 6;
+    const size_t SINGLE_EXPECTED = sizeof(size_t)*3 + sizeof(int);
+    const size_t SINGLE_EXPECTED_2 = sizeof(size_t)*3 + sizeof(int)*2;
+    const size_t SINGLE_EXPECTED_3 = sizeof(size_t)*3 + sizeof(int)*4;
+    const size_t MULTI_EXPECTED = sizeof(size_t)*3 + sizeof(int)*16;
+
+    array = init_arraylist(int);
+
+    arraylist_push(array, SINGLE_PUSH_TEST_VALUE);
+    ck_assert_int_eq(arraylist_length(array), 1);
+    ck_assert_int_eq(arraylist_capacity(array), 1);
+    ck_assert_int_eq(arraylist_memory_footprint(array), SINGLE_EXPECTED);
+
+    arraylist_push(array, SINGLE_PUSH_TEST_VALUE_2);
+    ck_assert_int_eq(arraylist_length(array), 2);
+    ck_assert_int_eq(arraylist_capacity(array), 2);
+    ck_assert_int_eq(arraylist_memory_footprint(array), SINGLE_EXPECTED_2);
+
+    arraylist_push(array, SINGLE_PUSH_TEST_VALUE_3);
+    ck_assert_int_eq(arraylist_length(array), 3);
+    ck_assert_int_eq(arraylist_capacity(array), 4);
+    ck_assert_int_eq(arraylist_memory_footprint(array), SINGLE_EXPECTED_3);
+
+    for(size_t i = 0; i < MULTI_PUSH_LEN; i++)
+    {
+        arraylist_push(array, MULTI_PUSH_TEST_VALUES[i]);
+    }
+    ck_assert_int_eq(arraylist_length(array), 9);
+    ck_assert_int_eq(arraylist_capacity(array), 16);
+    ck_assert_int_eq(arraylist_memory_footprint(array), MULTI_EXPECTED);
+
+    destroy_arraylist(array);
+}
+END_TEST
+
 Suite *arraylist_suite(void)
 {
 	Suite *s;
@@ -134,6 +176,7 @@ Suite *arraylist_suite(void)
     tcase_add_test(tc_core, test_arraylist_char_ptr_capacity_create_destroy);
     tcase_add_test(tc_core, test_arraylist_struct_create_destroy);
     tcase_add_test(tc_core, test_arraylist_struct_capacity_create_destroy);
+    tcase_add_test(tc_core, test_arraylist_int_push);
 	suite_add_tcase(s, tc_core);
 
 	return s;
