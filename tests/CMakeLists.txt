@@ -4,7 +4,7 @@
 find_package(Check REQUIRED)
 
 set(TEST_SOURCES
-	check_arraylist_new.c)
+	check_arraylist_new.c check_util.h check_util.c)
 
 add_executable(check_emberlib ${TEST_SOURCES})
 
@@ -13,3 +13,4 @@ target_include_directories(check_emberlib PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..
 
 target_link_directories(check_emberlib PRIVATE ${CHECK_LIBRARY_DIRS})
 target_link_libraries(check_emberlib PRIVATE ${CHECK_LIBRARIES})
+target_link_libraries(check_emberlib PRIVATE EmberLib)
