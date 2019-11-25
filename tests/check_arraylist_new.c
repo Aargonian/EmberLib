@@ -2,7 +2,6 @@
 #include "check_util.h"
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <check.h>
 
 START_TEST(test_arraylist_int_create_destroy)
@@ -103,12 +102,12 @@ START_TEST(test_arraylist_struct_create_destroy)
     ck_assert_uint_eq(arraylist_memory_footprint(array), expected_size);
 
     //All members of the struct should be their equivalent of '0'
-    printf("About to do the unthinkable.\n");
     emberlib_ck_assert_test_struct_equal(array, &check);
 
     destroy_arraylist(array);
     ck_assert_ptr_null(array);
 }
+
 END_TEST
 
 START_TEST(test_arraylist_struct_capacity_create_destroy)
@@ -359,6 +358,7 @@ START_TEST(test_arraylist_get)
 
     ck_assert_int_eq(arraylist_err, 0);
 
+    //Negative values should not be accessible
     int value = arraylist_get(array, -1, DEFAULT_VALUE);
     ck_assert_int_eq(value, DEFAULT_VALUE);
     ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
@@ -407,6 +407,112 @@ START_TEST(test_arraylist_get)
 
 END_TEST
 
+START_TEST(test_arraylist_set)
+{
+    int DEFAULT_VALUE = 0x7071996;
+    int *array = init_arraylist(int);
+
+    ck_assert_int_eq(arraylist_err, 0);
+
+    //Should be unable to set a value at a negative index
+    arraylist_set(array, -1, 5);
+    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
+    clear_arraylist_err();
+
+    //We should not be able to set a value at array index 0, even though it technically may exist under the hood
+    arraylist_set(array, 0, 10);
+    ck_assert_int_eq(array[0], 0);
+    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
+    clear_arraylist_err();
+
+    //Push an element for us to be able to set, then confirm we can change it
+    arraylist_push(array, 10);
+    ck_assert_int_eq(arraylist_get(array, 0, DEFAULT_VALUE), 10);
+    ck_assert_int_eq(arraylist_err, 0);
+    arraylist_set(array, 0, 17);
+    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(arraylist_get(array, 0, DEFAULT_VALUE), 17);
+
+    //Even though we pushed an element, capacity should equal length so we should be unable to set index 1
+    //Unfortunately, unlike index 0, we cannot be sure the default initialization set index 1 to some default value that
+    //we can check has not changed, so we can only test if the error value has been set, since it is conceivable by
+    //some chance that the garbadge data at index 1 happens to equal our test value.
+    arraylist_set(array, 1, 17);
+    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
+    clear_arraylist_err();
+
+    //Push two more elements so we have a total length = 3, but capacity of 4. We should still be unable to set index 3.
+    arraylist_push(array, 11);
+    arraylist_push(array, 12);
+    ck_assert_int_eq(arraylist_length(array), 3);
+    ck_assert_int_eq(arraylist_capacity(array), 4);
+
+    // We should still be able to set index 2
+    arraylist_set(array, 2, 17);
+    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(arraylist_get(array, 2, DEFAULT_VALUE), 17);
+
+    // We should not be able to set index 3
+    arraylist_set(array, 3, 17);
+    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
+
+    destroy_arraylist(array);
+}
+
+END_TEST
+
+START_TEST(test_arraylist_delete)
+{
+    size_t EXPECTED_SIZE_AFTER_INIT = sizeof(size_t) * 3 + 16 * (sizeof(int));
+    size_t EXPECTED_SIZE_AFTER_RESIZE = sizeof(size_t) * 3 + 8 * (sizeof(int));
+    int *array = init_arraylist(int);
+    for(size_t i = 0; i < 9; i++)
+        arraylist_push(array, i);
+
+    ck_assert_int_eq(arraylist_length(array), 9);
+    ck_assert_int_eq(arraylist_capacity(array), 16);
+    ck_assert_int_eq(arraylist_memory_footprint(array), EXPECTED_SIZE_AFTER_INIT);
+
+    //Remove element 7
+    arraylist_delete(array, 7);
+    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(arraylist_length(array), 8);
+    ck_assert_int_eq(arraylist_capacity(array), 16);
+    ck_assert_int_eq(arraylist_get(array, 7, -1), 8);
+
+    //Remove element 0
+    arraylist_delete(array, 0);
+    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(arraylist_length(array), 7);
+    ck_assert_int_eq(arraylist_capacity(array), 16);
+    ck_assert_int_eq(arraylist_get(array, 0, -1), 1);
+
+    //Remove enough elements to get us down to a length of 5
+    for(int i = 0; i < 2; i++)
+    {
+        arraylist_delete(array, 0);
+        ck_assert_int_eq(arraylist_err, 0);
+        ck_assert_int_eq(arraylist_length(array), 7 - i - 1);
+        ck_assert_int_eq(arraylist_capacity(array), 16);
+    }
+    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(arraylist_get(array, 0, -1), 3);
+    ck_assert_int_eq(arraylist_length(array), 5);
+    ck_assert_int_eq(arraylist_capacity(array), 16);
+
+    //Remove a final element
+    arraylist_delete(array, 0);
+    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(arraylist_get(array, 0, -1), 4);
+    ck_assert_int_eq(arraylist_length(array), 4);
+    ck_assert_int_eq(arraylist_capacity(array), 8);
+    ck_assert_int_eq(arraylist_memory_footprint(array), EXPECTED_SIZE_AFTER_RESIZE);
+
+    destroy_arraylist(array);
+}
+
+END_TEST
+
 Suite *arraylist_suite(void)
 {
     Suite *s;
@@ -428,6 +534,8 @@ Suite *arraylist_suite(void)
     tcase_add_test(tc_core, test_arraylist_struct_push);
     tcase_add_test(tc_core, test_arraylist_int_push_with_capacity);
     tcase_add_test(tc_core, test_arraylist_get);
+    tcase_add_test(tc_core, test_arraylist_set);
+    tcase_add_test(tc_core, test_arraylist_delete);
     suite_add_tcase(s, tc_core);
 
     return s;

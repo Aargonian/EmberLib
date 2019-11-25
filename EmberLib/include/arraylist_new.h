@@ -9,9 +9,11 @@
 
 #define ARRAYLIST_DEFAULT_CAPACITY 1
 
-/* Function Definitions */
+/* These can change at any time as part of the implementation and should not
+ * be used directly. You have been warned! */
 int __al_check_bounds(size_t index, size_t max);
 void __al_destroy_arraylist(void *array);
+void *__al_process_delete(void *arraylist, size_t index);
 void *__preprocess_al_push(void *arraylist);
 void *__create_generic_array(size_t element_size, size_t elements);
 
@@ -39,8 +41,8 @@ do {\
     __al_temp[0] += 1;\
 } while(0)
 
-#define arraylist_pop(ARRAY)\
-__typeof__(ARRAY) i;
+#define arraylist_delete(ARRAY, INDEX)\
+ARRAY = __al_process_delete(ARRAY, INDEX)
 
 #define arraylist_set(ARRAY, INDEX, VALUE) \
 do {\
