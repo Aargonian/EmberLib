@@ -468,11 +468,24 @@ START_TEST(test_arraylist_delete)
     int *array = init_arraylist(int);
     for(size_t i = 0; i < 9; i++)
         arraylist_push(array, i);
-
     ck_assert_int_eq(arraylist_length(array), 9);
     ck_assert_int_eq(arraylist_capacity(array), 16);
     ck_assert_int_eq(arraylist_memory_footprint(array), EXPECTED_SIZE_AFTER_INIT);
 
+    //First, negative tests.
+    //Confirm we can't delete a negative index
+    arraylist_delete(array, -1);
+    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
+    ck_assert_int_eq(arraylist_length(array), 9);
+    clear_arraylist_err();
+
+    //Confirm we can't delete an element at a higher index
+    arraylist_delete(array, arraylist_length(array));
+    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
+    ck_assert_int_eq(arraylist_length(array), 9);
+    clear_arraylist_err();
+
+    //Now for our positive tests
     //Remove element 7
     arraylist_delete(array, 7);
     ck_assert_int_eq(arraylist_err, 0);
@@ -507,6 +520,19 @@ START_TEST(test_arraylist_delete)
     ck_assert_int_eq(arraylist_length(array), 4);
     ck_assert_int_eq(arraylist_capacity(array), 8);
     ck_assert_int_eq(arraylist_memory_footprint(array), EXPECTED_SIZE_AFTER_RESIZE);
+
+    //Finally, make sure we can remove (pop) an element on the end
+    arraylist_delete(array, 3);
+    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(arraylist_get(array, 2, -1), 6);
+    ck_assert_int_eq(arraylist_length(array), 3);
+    ck_assert_int_eq(arraylist_capacity(array), 8);
+    ck_assert_int_eq(arraylist_memory_footprint(array), EXPECTED_SIZE_AFTER_RESIZE);
+
+    //Confirm that after the push we can't still get index 3
+    ck_assert_int_eq(arraylist_get(array, 3, -1), -1);
+    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
+    clear_arraylist_err();
 
     destroy_arraylist(array);
 }
