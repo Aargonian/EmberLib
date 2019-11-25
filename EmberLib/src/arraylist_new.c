@@ -1,4 +1,9 @@
+/*
+ * Created by Aaron Helton on 11/15/19
+ */
 #include <arraylist_new.h>
+#include <stdlib.h>
+#include <string.h>
 
 int arraylist_err = 0;
 
@@ -11,7 +16,11 @@ void *__al_process_delete(void *arraylist, size_t index)
     }
     size_t len = arraylist_length(arraylist);
 
-    //Unsigned char is the smallest addressable size on any system. Every other datatype must be some multiple of char.
+    /*
+     * Unsigned char is the smallest addressable size on any system. Every other
+     * datatype must be some multiple of char. As such, we'll treat the
+     * arraylist as an array of char, that way our pointer arithmetic works.
+     */
     unsigned char *iter_array = arraylist;
     for(size_t i = index; i < len - 1; i++)
     {
@@ -20,16 +29,23 @@ void *__al_process_delete(void *arraylist, size_t index)
                arraylist_element_size(arraylist));
     }
 
-    //Temporarily create the "real" version of the array so we can update values.
+    /*
+     * Temporarily create the "real" version of the array so we can update
+     * values without too much bit fiddling
+     */
     size_t *real_array = arraylist;
     real_array -= 3;
     real_array[0] -= 1;
 
-    //If we fall below 1/4th of our capacity, it's time to halve the array to
-    //save some memory
+    /*
+     * If we fall below 1/4th of our capacity, it's time to halve the array to
+     * save some memory.
+     */
     if(real_array[0] <= real_array[1] / 4)
     {
-        size_t new_size = arraylist_element_size(arraylist) * (arraylist_capacity(arraylist) / 2) + sizeof(size_t) * 3;
+        size_t new_size = arraylist_element_size(arraylist) *
+                          (arraylist_capacity(arraylist) / 2) +
+                          sizeof(size_t) * 3;
         size_t *new_arr = malloc(new_size);
         new_arr[0] = real_array[0];
         new_arr[1] = real_array[1] / 2;
@@ -63,7 +79,7 @@ void *__preprocess_al_push(void *array)
     arr = arr - 3;
     if(arr[0] == arr[1])
     {
-        //Double the array size you maggot
+        /* Double the array size you maggot */
         arr[1] *= 2;
         size_t new_size = arr[2] * arr[1] + sizeof(size_t) * 3;
         size_t *new_arr = malloc(new_size);
@@ -71,10 +87,10 @@ void *__preprocess_al_push(void *array)
         new_arr[1] = arr[1];
         new_arr[2] = arr[2];
 
-        //Copy the old elements
+        /* Copy the old elements */
         memcpy((void *) (new_arr + 3), array, arr[0] * arr[2]);
 
-        //Free the old data
+        /* Free the old data */
         free(arr);
         return (void *) (new_arr + 3);
     }

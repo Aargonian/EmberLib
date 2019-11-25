@@ -1,6 +1,6 @@
-//
-// Created by Aaron Helton on 11/24/19.
-//
+/*
+ * Created by Aaron Helton on 11/24/19.
+ */
 #include <check.h>
 #include <string.h>
 
@@ -10,11 +10,19 @@
 #define emberlib_ck_enable_test_struct_testing()\
 char __emberlib_struct_test_msg[__EL_MAX_MESSAGE_LENGTH]
 
-/* Macro in the style of Check so that it integrates easily and no mistakes are accidentally made */
+/*
+ * Macro in the style of Check so that it integrates easily and no mistakes are
+ * accidentally made.
+ */
 #define emberlib_ck_assert_test_struct_equal(X, Y)\
-memset(__emberlib_struct_test_msg, 0, __EL_MAX_MESSAGE_LENGTH*sizeof(char));\
-ck_assert_msg(struct_equal((X), (Y), __emberlib_struct_test_msg), __emberlib_struct_test_msg)
+memset(__emberlib_struct_test_msg, 0,\
+       __EL_MAX_MESSAGE_LENGTH*sizeof(char));\
+ck_assert_msg(struct_equal((X), (Y), __emberlib_struct_test_msg),\
+              __emberlib_struct_test_msg)
 
+/*
+ * Simple struct defining many types for testing the arraylist on structs
+ */
 typedef struct
 {
     char _test_char;

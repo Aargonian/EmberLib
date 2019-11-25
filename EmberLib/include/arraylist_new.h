@@ -5,13 +5,7 @@
 #define EMBERLIB_ARRAYLIST_NEW_H
 
 #include <stdlib.h>
-#include <string.h>
 
-#define ARRAYLIST_DEFAULT_CAPACITY 1
-
-int __al_check_bounds(size_t index, size_t max);
-void *__al_process_delete(void *arraylist, size_t index);
-void *__preprocess_al_push(void *arraylist);
 
 /*******************************************************************************
  * Small utility macros for the other macros, plus the error definitions
@@ -23,7 +17,7 @@ void *__preprocess_al_push(void *arraylist);
 #define arraylist_element_size(ARRAY)\
     *(((size_t *)(ARRAY))-1)
 #define arraylist_memory_footprint(ARRAY)\
-    ((arraylist_element_size(ARRAY)*arraylist_capacity(ARRAY)) + 3*sizeof(size_t))
+    ((arraylist_element_size(ARRAY)*arraylist_capacity(ARRAY))+3*sizeof(size_t))
 
 extern int arraylist_err;
 #define AL_ERR_OUT_OF_BOUNDS 1
@@ -38,6 +32,7 @@ void __al_destroy_arraylist(void *array);
 #define init_arraylist_with_capacity(TYPE, CAPACITY)\
     (TYPE *)__create_generic_array(sizeof(TYPE), CAPACITY)
 
+#define ARRAYLIST_DEFAULT_CAPACITY 1
 #define init_arraylist(TYPE)\
     init_arraylist_with_capacity(TYPE, ARRAYLIST_DEFAULT_CAPACITY)
 
@@ -67,6 +62,9 @@ ARRAY = NULL;\
 /*******************************************************************************
  * Utility Functions
  ******************************************************************************/
+int __al_check_bounds(size_t index, size_t max);
+void *__al_process_delete(void *arraylist, size_t index);
+void *__preprocess_al_push(void *arraylist);
 
 #define arraylist_push(ARRAY, VALUE) \
 do {\
