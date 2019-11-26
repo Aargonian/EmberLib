@@ -1,6 +1,6 @@
 set(SOURCES ${CONFIG_HEADER}
-	    include/arraylist_new.h 
-	    include/arraylist_old.h
+	    include/arraylist_new.h
+		old/arraylist_old.h
 	    src/arraylist_new.c)
 
 add_library(EmberLib STATIC ${SOURCES})
