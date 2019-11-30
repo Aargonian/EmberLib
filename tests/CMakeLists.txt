@@ -5,14 +5,14 @@
 
 find_package(Check REQUIRED)
 
-set(TEST_SOURCES
-	check_arraylist_new.c check_util.h check_util.c)
+set(TEST_SOURCES check_arraylist_new.c
+                 check_util.h
+                 check_util.c)
 
 add_executable(check EXCLUDE_FROM_ALL ${TEST_SOURCES})
 
 target_include_directories(check PRIVATE ${CHECK_INCLUDE_DIRS})
-target_include_directories(check PRIVATE
-		                   ${CMAKE_CURRENT_SOURCE_DIR}/../EmberLib/include)
+target_include_directories(check PRIVATE ${EmberLib_INCLUDE_DIRS})
 
 target_link_directories(check PRIVATE ${CHECK_LIBRARY_DIRS})
 target_link_libraries(check PRIVATE ${CHECK_LIBRARIES})
