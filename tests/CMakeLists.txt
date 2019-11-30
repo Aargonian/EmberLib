@@ -8,12 +8,12 @@ find_package(Check REQUIRED)
 set(TEST_SOURCES
 	check_arraylist_new.c check_util.h check_util.c)
 
-add_executable(check_emberlib ${TEST_SOURCES})
+add_executable(check EXCLUDE_FROM_ALL ${TEST_SOURCES})
 
-target_include_directories(check_emberlib PRIVATE ${CHECK_INCLUDE_DIRS})
-target_include_directories(check_emberlib PRIVATE
+target_include_directories(check PRIVATE ${CHECK_INCLUDE_DIRS})
+target_include_directories(check PRIVATE
 		                   ${CMAKE_CURRENT_SOURCE_DIR}/../EmberLib/include)
 
-target_link_directories(check_emberlib PRIVATE ${CHECK_LIBRARY_DIRS})
-target_link_libraries(check_emberlib PRIVATE ${CHECK_LIBRARIES})
-target_link_libraries(check_emberlib PRIVATE EmberLib)
+target_link_directories(check PRIVATE ${CHECK_LIBRARY_DIRS})
+target_link_libraries(check PRIVATE ${CHECK_LIBRARIES})
+target_link_libraries(check PRIVATE EmberLib)

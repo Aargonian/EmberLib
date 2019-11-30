@@ -43,4 +43,4 @@ add_subdirectory(src)
 add_subdirectory(tests)
 
 enable_testing()
-add_test(NAME check_emberlib COMMAND check_emberlib)
+add_test(NAME check COMMAND check)
