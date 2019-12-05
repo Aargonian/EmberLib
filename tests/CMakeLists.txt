@@ -3,17 +3,19 @@
 #
 # set(CHECK_INSTALL_DIR "C:/Program Files/check")
 
-find_package(Check REQUIRED)
+find_package(Check)
 
-set(TEST_SOURCES check_arraylist_new.c
-                 check_util.h
-                 check_util.c)
+if(NOT ${CHECK_FOUND})
+    set(TEST_SOURCES check_arraylist_new.c
+                     check_util.h
+                     check_util.c)
 
-add_executable(check EXCLUDE_FROM_ALL ${TEST_SOURCES})
+    add_executable(check EXCLUDE_FROM_ALL ${TEST_SOURCES})
 
-target_include_directories(check PRIVATE ${CHECK_INCLUDE_DIRS})
-target_include_directories(check PRIVATE ${EmberLib_INCLUDE_DIRS})
+    target_include_directories(check PRIVATE ${CHECK_INCLUDE_DIRS})
+    target_include_directories(check PRIVATE ${EmberLib_INCLUDE_DIRS})
 
-target_link_directories(check PRIVATE ${CHECK_LIBRARY_DIRS})
-target_link_libraries(check PRIVATE ${CHECK_LIBRARIES})
-target_link_libraries(check PRIVATE EmberLib)
+    target_link_directories(check PRIVATE ${CHECK_LIBRARY_DIRS})
+    target_link_libraries(check PRIVATE ${CHECK_LIBRARIES})
+    target_link_libraries(check PRIVATE EmberLib)
+endif(NOT ${CHECK_FOUND})
