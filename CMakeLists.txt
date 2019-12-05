@@ -5,6 +5,10 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+if(NOT DEFINED BUILD_TESTS)
+	set(BUILD_TESTS TRUE)
+endif(NOT DEFINED BUILD_TESTS)
+
 include(CheckCSourceCompiles)
 include(CheckCSourceRuns)
 include(CheckFunctionExists)
@@ -12,7 +16,6 @@ include(CheckIncludeFile)
 include(CheckLibraryExists)
 include(CheckSymbolExists)
 include(CheckTypeSize)
-
 # Check Headers
 set(INCLUDES "")
 macro(ck_check_include_file header var)
@@ -42,7 +45,10 @@ set(CONFIG_HEADER ${CMAKE_CURRENT_BINARY_DIR/config.h})
 
 add_subdirectory(src)
 add_subdirectory(demo)
-add_subdirectory(tests)
+
+if(${BUILD_TESTS})
+	add_subdirectory(tests)
+endif(${BUILD_TESTS})
 
 enable_testing()
 add_test(NAME check COMMAND check)
