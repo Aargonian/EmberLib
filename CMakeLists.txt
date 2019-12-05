@@ -5,8 +5,10 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+# Note that testing requires libcheck to be installed on the system!
+# See the tests/CMakeLists.txt file for details.
 if(NOT DEFINED BUILD_TESTS)
-	set(BUILD_TESTS TRUE)
+	set(BUILD_TESTS FALSE)
 endif(NOT DEFINED BUILD_TESTS)
 
 include(CheckCSourceCompiles)

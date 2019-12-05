@@ -1,9 +1,8 @@
-# If pkg-config is not installed on the system, then CHECK_INSTALL_DIR variable
-# must be set to the install location of Check
-#
-# set(CHECK_INSTALL_DIR "C:/Program Files/check")
-
 if(${BUILD_TESTS})
+    # If pkg-config is not installed on the system, or if you are on Windows, then CHECK_INSTALL_DIR variable must be
+    # set to the install location of libcheck.
+    #
+    # set(CHECK_INSTALL_DIR "C:/Program Files/check")
     find_package(Check REQUIRED)
 
     set(TEST_SOURCES check_arraylist_new.c
