@@ -182,3 +182,37 @@ int compare_estring(const EmberString *str, const EmberString *other)
         return 0;
     }
 }
+
+#include <stdio.h>
+EmberString *estring_concat(EmberString *str, EmberString *other)
+{
+    if(str == NULL)
+    {
+        error_val = EMBER_STRING_NULL_ARG;
+        if(!other)
+        {
+            return create_estring_from_cstr("", 0);
+        }
+        return create_estring_from_cstr(other->c_str, other->len);
+    }
+    if(other == NULL)
+    {
+        error_val = EMBER_STRING_NULL_ARG;
+        return create_estring_from_cstr(str->c_str, str->len);
+    }
+
+    EmberString *result = malloc(sizeof(EmberString));
+    result->len = str->len + other->len;
+    result->c_str = malloc(sizeof(char) * (result->len + 1));
+
+    for(size_t i = 0; i < str->len; i++)
+    {
+        result->c_str[i] = str->c_str[i];
+    }
+    for(size_t i = str->len; i < other->len+str->len; i++)
+    {
+        result->c_str[i] = other->c_str[i-str->len];
+    }
+    result->c_str[result->len] = '\0';
+    return result;
+}

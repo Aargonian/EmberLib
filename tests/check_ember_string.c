@@ -82,6 +82,84 @@ START_TEST(test_ember_string_from_cstr)
 }
 END_TEST
 
+START_TEST(test_ember_string_concat)
+{
+    EmberString *str1 = create_estring_from_cstr("String1", 7);
+    EmberString *str2 = create_estring_from_cstr("String2", 7);
+    EmberString *empty = create_estring_from_cstr("", 0);
+    EmberString *null_str = NULL;
+
+    EmberString *result = estring_concat(str1, str2);
+    ck_assert_ptr_nonnull(result);
+    ck_assert_ptr_nonnull(result->c_str);
+    ck_assert_ptr_ne(result->c_str, str1->c_str);
+    ck_assert_ptr_ne(result->c_str, str2->c_str);
+    ck_assert_int_eq(result->len, str1->len+str2->len);
+    ck_assert_str_eq(result->c_str, "String1String2");
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+
+    result = estring_concat(str2, str1);
+    ck_assert_ptr_nonnull(result);
+    ck_assert_ptr_nonnull(result->c_str);
+    ck_assert_ptr_ne(result->c_str, str1->c_str);
+    ck_assert_ptr_ne(result->c_str, str2->c_str);
+    ck_assert_int_eq(result->len, str1->len+str2->len);
+    ck_assert_str_eq(result->c_str, "String2String1");
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+
+    result = estring_concat(str1, empty);
+    ck_assert_ptr_nonnull(result);
+    ck_assert_ptr_nonnull(result->c_str);
+    ck_assert_ptr_ne(result->c_str, str1->c_str);
+    ck_assert_ptr_ne(result->c_str, empty->c_str);
+    ck_assert_int_eq(result->len, str1->len);
+    ck_assert_str_eq(result->c_str, "String1");
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+
+    result = estring_concat(str1, null_str);
+    ck_assert_ptr_nonnull(result);
+    ck_assert_ptr_nonnull(result->c_str);
+    ck_assert_ptr_ne(result->c_str, str1->c_str);
+    ck_assert_ptr_ne(result->c_str, empty->c_str);
+    ck_assert_int_eq(result->len, str1->len);
+    ck_assert_str_eq(result->c_str, "String1");
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NULL_ARG);
+    clear_ember_string_error();
+
+    result = estring_concat(null_str, str2);
+    ck_assert_ptr_nonnull(result);
+    ck_assert_ptr_nonnull(result->c_str);
+    ck_assert_ptr_ne(result->c_str, str2->c_str);
+    ck_assert_ptr_ne(result->c_str, empty->c_str);
+    ck_assert_int_eq(result->len, str1->len);
+    ck_assert_str_eq(result->c_str, "String2");
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NULL_ARG);
+    clear_ember_string_error();
+
+    result = estring_concat(null_str, null_str);
+    ck_assert_ptr_nonnull(result);
+    ck_assert_ptr_nonnull(result->c_str);
+    ck_assert_int_eq(result->len, empty->len);
+    ck_assert_str_eq(result->c_str, empty->c_str);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NULL_ARG);
+    clear_ember_string_error();
+
+    result = estring_concat(empty, empty);
+    ck_assert_ptr_nonnull(result);
+    ck_assert_ptr_nonnull(result->c_str);
+    ck_assert_ptr_ne(result->c_str, empty->c_str);
+    ck_assert_int_eq(result->len, empty->len);
+    ck_assert_str_eq(result->c_str, empty->c_str);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    clear_ember_string_error();
+
+    destroy_estring(str1);
+    destroy_estring(str2);
+    destroy_estring(empty);
+    destroy_estring(result);
+}
+END_TEST
+
 Suite *ember_string_suite(void)
 {
     Suite *s;
@@ -93,6 +171,7 @@ Suite *ember_string_suite(void)
     tc_core = tcase_create("Core");
 
     tcase_add_test(tc_core, test_ember_string_from_cstr);
+    tcase_add_test(tc_core, test_ember_string_concat);
     suite_add_tcase(s, tc_core);
 
     return s;

@@ -52,6 +52,19 @@ EmberString *strip_estring(EmberString *str);
  */
 int compare_estring(const EmberString *str, const EmberString *other);
 
+/**
+ * Concatenates two EmberStrings into a new EmberString. If one or both strings
+ * are NULL, ember_string_error will be set to EMBER_STRING_NULL_ARG. In the
+ * case of null arguments, if only one string is null, it will return a new
+ * EmberString that is essentially just the non-null string. If both strings are
+ * NULL, it will return a valid, but empty, EmberString.
+ *
+ * @param str The first string to concatenate.
+ * @param other The second string to concatenate.
+ * @return A string that is the concatenation of both input strings.
+ */
+EmberString *estring_concat(EmberString *str, EmberString *other);
+
 /*
  * Error Handling Stuff
  */
