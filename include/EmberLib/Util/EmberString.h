@@ -5,7 +5,8 @@
 #ifndef EMBERLIB_EMBERSTRING_H
 #define EMBERLIB_EMBERSTRING_H
 
-#include <limits.h>
+#include <stdlib.h>
+
 
 /**
  * EmberString is used to make using stanard, ascii-based character arrays much
@@ -27,7 +28,7 @@ typedef struct EmberString
  * @param max_buffer
  * @return an EmberString containing the c_str and the length.
  */
-EmberString *create_estring_from_cstr(const char *str);
+EmberString *create_estring_from_cstr(const char *str, size_t max_len);
 
 /**
  * Free the allocated data from an EmberString. NULL is an acceptable input.
@@ -50,5 +51,31 @@ EmberString *strip_estring(EmberString *str);
  * @return -1 if the first argument is less than, 1 if greater, 0 if equal
  */
 int compare_estring(const EmberString *str, const EmberString *other);
+
+/*
+ * Error Handling Stuff
+ */
+
+/**
+ * Simple enum defining the various errors that can be set by string functions.
+ */
+typedef enum EmberStringError {
+    EMBER_STRING_NO_ERR = 0,
+    EMBER_STRING_NULL_ARG,
+    EMBER_STRING_INVALID_LEN,
+    EMBER_STRING_TRUNCATED,
+} EmberStringError;
+
+/**
+ * Returns any error that may have been set by the library by a previous string
+ * operations. Valid errors can be seen in the EmberStringError enum.
+ * @return Any error code in EmberStringError, or EMBER_STRING_NO_ERR.
+ */
+EmberStringError ember_string_error(void);
+
+/**
+ * Clears any currently set errors in EmberStringError.
+ */
+void clear_ember_string_error(void);
 
 #endif //EMBERLIB_EMBERSTRING_H

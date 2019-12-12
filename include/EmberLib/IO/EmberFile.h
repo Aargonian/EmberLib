@@ -40,7 +40,6 @@ typedef enum EmberFileMode {
  *     2. If a File is opened as READ_ONLY, and the program does not have
  *        sufficient privileges, it will set EMBER_PERMISSION_ERR.
  */
-ember_file *open_file(FILE_MODE mode);
 
 
 #endif //EMBERLIB_EMBERFILE_H

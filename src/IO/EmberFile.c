@@ -5,10 +5,10 @@
 #include <EmberLib/IO/EmberFile.h>
 #include <EmberLib/Util/EmberString.h>
 
-ember_file *open_file(FILE_MODE mode)
+/*ember_file *open_file(FILE_MODE mode)
 {
     return NULL;
-}
+}*/
 
 
 

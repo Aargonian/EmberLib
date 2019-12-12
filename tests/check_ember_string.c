@@ -1,0 +1,114 @@
+/*
+ * Created by Aaron Helton on 11/22/19
+ */
+#include <EmberLib/Util/EmberString.h>
+#include <stdlib.h>
+#include <check.h>
+
+START_TEST(test_ember_string_from_cstr)
+{
+    char *TEST_STR_1 = "Test_String_One";
+    char *TEST_STR_2 = "TEST STRING TOO LONG";
+    char *TEST_STR_TRUNCATED = "TEST STRIN";
+    size_t TEST_STR_TRUNCATED_LEN = 10;
+    size_t TEST_STR_1_LEN = 15;
+
+    EmberString *str = create_estring_from_cstr(TEST_STR_1, TEST_STR_1_LEN);
+
+    /*
+     * We should be able to create a string from a standard c-string with no
+     * issues. The length should include all characters minus the null byte.
+     * The two strings should have no differences.
+     */
+    ck_assert_ptr_nonnull(str);
+    ck_assert_ptr_nonnull(str->c_str);
+    ck_assert_uint_eq(str->len, TEST_STR_1_LEN);
+    ck_assert_str_eq(TEST_STR_1, str->c_str);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    destroy_estring(str);
+
+    /*
+     * Attempt to use a buffer that is far too large. The resulting length
+     * should be no more than the length of the string, regardless. Null padding
+     * does not occur.
+     */
+    str = create_estring_from_cstr(TEST_STR_1, TEST_STR_1_LEN*1000);
+    ck_assert_ptr_nonnull(str);
+    ck_assert_ptr_nonnull(str->c_str);
+    ck_assert_uint_eq(str->len, TEST_STR_1_LEN);
+    ck_assert_str_eq(TEST_STR_1, str->c_str);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    destroy_estring(str);
+
+    /*
+     * Attempt to create an "empty" EmberString.
+     */
+    str = create_estring_from_cstr("", 0);
+    ck_assert_ptr_nonnull(str);
+    ck_assert_ptr_nonnull(str->c_str);
+    ck_assert_uint_eq(str->len, 0);
+    ck_assert_str_eq(str->c_str, "");
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    destroy_estring(str);
+
+    /*
+     * Attempt to create a string with a NULL ptr. The string should
+     * technically be a valid, but empty, string. This should set an error
+     * EMBER_STRING_NULL_ARG.
+     */
+    str = create_estring_from_cstr(NULL, 0);
+    ck_assert_ptr_nonnull(str);
+    ck_assert_ptr_nonnull(str->c_str);
+    ck_assert_uint_eq(str->len, 0);
+    ck_assert_str_eq(str->c_str, "");
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NULL_ARG);
+    clear_ember_string_error();
+    destroy_estring(str);
+
+    /*
+     * Attempt to create a string, but with a buffer length smaller than the
+     * total string length. This should truncate the string, but it should still
+     * end with a NULL byte, and the length should equal the max buffer length.
+     */
+    str = create_estring_from_cstr(TEST_STR_2, TEST_STR_TRUNCATED_LEN);
+    ck_assert_ptr_nonnull(str);
+    ck_assert_ptr_nonnull(str->c_str);
+    ck_assert_uint_eq(str->len, TEST_STR_TRUNCATED_LEN);
+    ck_assert_str_eq(str->c_str, TEST_STR_TRUNCATED);
+    ck_assert_str_ne(str->c_str, TEST_STR_2);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_TRUNCATED);
+    clear_ember_string_error();
+    destroy_estring(str);
+}
+END_TEST
+
+Suite *ember_string_suite(void)
+{
+    Suite *s;
+    TCase *tc_core;
+
+    s = suite_create("Arraylist_New");
+
+    /* Core Test Case */
+    tc_core = tcase_create("Core");
+
+    tcase_add_test(tc_core, test_ember_string_from_cstr);
+    suite_add_tcase(s, tc_core);
+
+    return s;
+}
+
+int main(void)
+{
+    int number_failed;
+    Suite *s;
+    SRunner *sr;
+
+    s = ember_string_suite();
+    sr = srunner_create(s);
+
+    srunner_run_all(sr, CK_NORMAL);
+    number_failed = srunner_ntests_failed(sr);
+    srunner_free(sr);
+    return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+}

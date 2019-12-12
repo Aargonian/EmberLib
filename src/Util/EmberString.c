@@ -5,13 +5,26 @@
 #include <EmberLib/Util/EmberString.h>
 #include <stdlib.h>
 
-EmberString *create_from_cstr(const char *str, size_t max_buffer)
+static EmberStringError error_val;
+
+EmberStringError ember_string_error(void)
+{
+    return error_val;
+}
+
+void clear_ember_string_error(void)
+{
+    error_val = EMBER_STRING_NO_ERR;
+}
+
+EmberString *create_estring_from_cstr(const char *str, size_t max_buffer)
 {
     EmberString *new_str = (EmberString *) malloc(sizeof(EmberString));
     if(!str)
     {
-        //The passed c EmberString is a null or invalid pointer.
-        new_str->c_str = NULL;
+        error_val = EMBER_STRING_NULL_ARG;
+        new_str->c_str = malloc(sizeof(char));
+        new_str->c_str[0] = '\0';
         new_str->len = 0;
         return new_str;
     }
@@ -21,6 +34,11 @@ EmberString *create_from_cstr(const char *str, size_t max_buffer)
     for(index = 0; index < max_buffer && str[index] != '\0'; index++)
     {
         size++;
+    }
+
+    if(index == max_buffer && str[index] != '\0')
+    {
+        error_val = EMBER_STRING_TRUNCATED;
     }
 
     //Make sure to +1 for the null byte at the end
@@ -34,13 +52,14 @@ EmberString *create_from_cstr(const char *str, size_t max_buffer)
     return new_str;
 }
 
-void destroy_EmberString(EmberString *str)
+void destroy_estring(EmberString *str)
 {
     if(str)
     {
         if(str->c_str)
         {
             free(str->c_str);
+            str->c_str = NULL;
         }
         str->c_str = 0;
     }
@@ -56,7 +75,7 @@ static int is_whitespace(char c)
     return 0;
 }
 
-EmberString *strip(EmberString *str)
+EmberString *strip_estring(EmberString *str)
 {
     //Sanity check
     if(!str || !str->c_str || str->len == 0)
@@ -111,22 +130,6 @@ EmberString *strip(EmberString *str)
         str->len -= chop_off;
     }
     return str;
-}
-
-int compare_on_length(const EmberString *str, const EmberString *other)
-{
-    if(str->len < other->len)
-    {
-        return -1;
-    }
-    else if(str->len > other->len)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
 }
 
 /*
