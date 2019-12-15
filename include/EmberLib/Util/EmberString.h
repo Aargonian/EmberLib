@@ -48,7 +48,8 @@ void destroy_estring(EmberString *str);
 /**
  * Simple enum defining the various errors that can be set by string functions.
  */
-typedef enum EmberStringError {
+typedef enum EmberStringError
+{
     EMBER_STRING_NO_ERR = 0,
     EMBER_STRING_NULL_ARG,
     EMBER_STRING_INVALID_LEN,
@@ -86,7 +87,8 @@ void clear_ember_string_error(void);
  * @return A substring containing the same characters of the original string
  *         from start to end, or NULL if an error is encountered.
  */
-EmberString *estring_substring(EmberString *str, size_t start, size_t end);
+EmberString *estring_substring(const EmberString *str, size_t start,
+                               size_t end);
 #endif //EMBERLIB_EMBERSTRING_H
 
 /**
@@ -112,6 +114,16 @@ EmberString *estring_strip(EmberString *str);
 
 /**
  * Compares two EmberStrings to determine correct alphabetical ordering.
+ * Uppercase characters are considered less than uppercase characters.
+ * @param str The first string to compare
+ * @param other The other string to compare
+ * @return -1 if the first argument is less than, 1 if greater, 0 if equal
+ */
+int estring_compare_with_case(const EmberString *str, const EmberString *other);
+
+/**
+ * Compares two EmberStrings to determine correct alphabetical ordering. Case
+ * does not matter.
  * @param str The first string to compare
  * @param other The other string to compare
  * @return -1 if the first argument is less than, 1 if greater, 0 if equal

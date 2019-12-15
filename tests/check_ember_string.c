@@ -253,9 +253,9 @@ START_TEST(test_ember_string_strip)
 {
     EmberString *empty = create_estring_from_cstr("", 0);
     EmberString *test1 = create_estring_from_cstr("\n \t\t\n \v\v\v TEST \n\v\v"
-                                                 "\t \t  ", 23);
+                                                  "\t \t  ", 23);
     EmberString *test2 = create_estring_from_cstr("\nTEST whitespace exists "
-                                                 "inside \t\v END\t\t", 39);
+                                                  "inside \t\v END\t\t", 39);
     EmberString *test3 = create_estring_from_cstr("TEST 3", 6);
 
     EmberString *test_str = estring_strip(test1);
@@ -311,6 +311,60 @@ START_TEST(test_ember_string_strip)
 }
 END_TEST
 
+START_TEST(test_ember_string_compare)
+{
+    EmberString *test0 = create_estring_from_cstr("Aaron", 5);
+    EmberString *test1 = create_estring_from_cstr("Braid", 5);
+    EmberString *test2 = create_estring_from_cstr("Aaro", 4);
+    EmberString *test3 = create_estring_from_cstr("aaro", 4);
+    EmberString *empty = create_estring_from_cstr("", 0);
+
+    int result = estring_compare(test0, test1);
+    ck_assert_int_lt(result, 0);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+
+    result = estring_compare(test0, test2);
+    ck_assert_int_gt(result, 0);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+
+    result = estring_compare(test0, test0);
+    ck_assert_int_eq(result, 0);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+
+    result = estring_compare(test0, empty);
+    ck_assert_int_gt(result, 0);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+
+    result = estring_compare(test2, test3);
+    ck_assert_int_eq(result, 0);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+
+    result = estring_compare_with_case(test2, test3);
+    ck_assert_int_lt(result, 0);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+
+    result = estring_compare(test1, NULL);
+    ck_assert_int_gt(result, 0);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NULL_ARG);
+    clear_ember_string_error();
+
+    result = estring_compare(NULL, test1);
+    ck_assert_int_lt(result, 0);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NULL_ARG);
+    clear_ember_string_error();
+
+    result = estring_compare(NULL, NULL);
+    ck_assert_int_eq(result, 0);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NULL_ARG);
+    clear_ember_string_error();
+
+    destroy_estring(test0);
+    destroy_estring(test1);
+    destroy_estring(test2);
+    destroy_estring(test3);
+    destroy_estring(empty);
+}
+
 Suite *ember_string_suite(void)
 {
     Suite *s;
@@ -325,6 +379,7 @@ Suite *ember_string_suite(void)
     tcase_add_test(tc_core, test_ember_string_concat);
     tcase_add_test(tc_core, test_ember_substring);
     tcase_add_test(tc_core, test_ember_string_strip);
+    tcase_add_test(tc_core, test_ember_string_compare);
 
     suite_add_tcase(s, tc_core);
 

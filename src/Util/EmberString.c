@@ -28,6 +28,51 @@ static int is_whitespace(char c)
     return 0;
 }
 
+static int estr_compare(const EmberString *str, const EmberString *other,
+                        int case_sensitivity)
+{
+    size_t min_len = str->len < other->len ? str->len : other->len;
+    for(size_t index = 0; index < min_len; index++)
+    {
+        char str_lower_char;
+        char other_lower_char;
+
+        if(!case_sensitivity)
+        {
+            str_lower_char = lowercase(str->c_str[index]);
+            other_lower_char = lowercase(other->c_str[index]);
+        }
+        else
+        {
+            str_lower_char = str->c_str[index];
+            other_lower_char = other->c_str[index];
+        }
+
+        if(str_lower_char < other_lower_char)
+        {
+            return -1;
+        }
+        else if(str_lower_char > other_lower_char)
+        {
+            return 1;
+        }
+    }
+
+    //Only difference is length
+    if(str->len < other->len)
+    {
+        return -1;
+    }
+    else if(str->len > other->len)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 /*******************************************************************************
  * String creation and destruction functions
  ******************************************************************************/
@@ -95,7 +140,7 @@ void clear_ember_string_error(void)
  * Utility Functions
  ******************************************************************************/
 
-EmberString *estring_substring(EmberString *str, size_t start, size_t end)
+EmberString *estring_substring(const EmberString *str, size_t start, size_t end)
 {
     if(!str || !str->c_str)
     {
@@ -109,12 +154,12 @@ EmberString *estring_substring(EmberString *str, size_t start, size_t end)
     }
 
     EmberString *ret = malloc(sizeof(EmberString));
-    ret->len = end-start;
-    ret->c_str = malloc(sizeof(char)*ret->len);
+    ret->len = end - start;
+    ret->c_str = malloc(sizeof(char) * ret->len);
 
     for(size_t i = 0; i < ret->len; i++)
     {
-        ret->c_str[i] = str->c_str[start+i];
+        ret->c_str[i] = str->c_str[start + i];
     }
     ret->c_str[ret->len] = '\0';
 
@@ -146,15 +191,14 @@ EmberString *estring_concat(EmberString *str, EmberString *other)
     {
         result->c_str[i] = str->c_str[i];
     }
-    for(size_t i = str->len; i < other->len+str->len; i++)
+    for(size_t i = str->len; i < other->len + str->len; i++)
     {
-        result->c_str[i] = other->c_str[i-str->len];
+        result->c_str[i] = other->c_str[i - str->len];
     }
     result->c_str[result->len] = '\0';
     return result;
 }
 
-#include <stdio.h>
 EmberString *estring_strip(EmberString *str)
 {
     //Sanity check
@@ -165,52 +209,56 @@ EmberString *estring_strip(EmberString *str)
     }
     if(str->len == 0)
     {
-        EmberString *ret = malloc(sizeof(EmberString));
-        ret->c_str = malloc(sizeof(char));
-        ret->c_str[0] = '\0';
-        ret->len = 0;
-        return ret;
+        return create_estring_from_cstr("", 0);
     }
 
     size_t left = 0;
-    size_t right = str->len-1;
+    size_t right = str->len - 1;
 
-    for(; left < str->len && is_whitespace(str->c_str[left]); left++);
-    for(; right > left && is_whitespace(str->c_str[right]); right--);
+    for(; left < str->len && is_whitespace(str->c_str[left]); left++)
+    {}
+    for(; right > left && is_whitespace(str->c_str[right]); right--)
+    {}
 
-    return estring_substring(str, left, right+1);
+    return estring_substring(str, left, right + 1);
+}
+
+int estring_compare_with_case(const EmberString *str, const EmberString *other)
+{
+    /* Null is considered less than everything. It is still an error though. */
+    if(str == NULL)
+    {
+        error_val = EMBER_STRING_NULL_ARG;
+        if(other == NULL)
+        {
+            return 0;
+        }
+        return -1;
+    }
+    if(other == NULL)
+    {
+        error_val = EMBER_STRING_NULL_ARG;
+        return 1;
+    }
+    return estr_compare(str, other, 1);
 }
 
 int estring_compare(const EmberString *str, const EmberString *other)
 {
-    size_t min_len = str->len < other->len ? str->len : other->len;
-    for(size_t index = 0; index < min_len; index++)
+    /* Null is considered less than everything. It is still an error though. */
+    if(str == NULL)
     {
-        char str_lower_char = lowercase(str->c_str[index]);
-        char other_lower_char = lowercase(other->c_str[index]);
-        if(str_lower_char < other_lower_char)
+        error_val = EMBER_STRING_NULL_ARG;
+        if(other == NULL)
         {
-            return -1;
+            return 0;
         }
-        else if(str_lower_char > other_lower_char)
-        {
-            return 1;
-        }
-    }
-
-    //Only difference is length
-    if(str->len < other->len)
-    {
         return -1;
     }
-    else if(str->len > other->len)
+    if(other == NULL)
     {
+        error_val = EMBER_STRING_NULL_ARG;
         return 1;
     }
-    else
-    {
-        return 0;
-    }
+    return estr_compare(str, other, 0);
 }
-
-
