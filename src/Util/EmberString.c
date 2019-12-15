@@ -5,17 +5,32 @@
 #include <EmberLib/Util/EmberString.h>
 #include <stdlib.h>
 
+/*******************************************************************************
+ * Static Helper Functions
+ ******************************************************************************/
 static EmberStringError error_val;
 
-EmberStringError ember_string_error(void)
+static char lowercase(char c)
 {
-    return error_val;
+    if(c < 'A' || c > 'Z')
+    {
+        return c;
+    }
+    return (char) (c + 32);
 }
 
-void clear_ember_string_error(void)
+static int is_whitespace(char c)
 {
-    error_val = EMBER_STRING_NO_ERR;
+    if(c == ' ' || c == '\t' || c == '\n' || c == '\v')
+    {
+        return 1;
+    }
+    return 0;
 }
+
+/*******************************************************************************
+ * String creation and destruction functions
+ ******************************************************************************/
 
 EmberString *create_estring_from_cstr(const char *str, size_t max_buffer)
 {
@@ -62,13 +77,81 @@ void destroy_estring(EmberString *str)
     free(str);
 }
 
-static int is_whitespace(char c)
+/*******************************************************************************
+ * Error Handling
+ ******************************************************************************/
+
+EmberStringError ember_string_error(void)
 {
-    if(c == ' ' || c == '\t' || c == '\n' || c == '\v')
+    return error_val;
+}
+
+void clear_ember_string_error(void)
+{
+    error_val = EMBER_STRING_NO_ERR;
+}
+
+/*******************************************************************************
+ * Utility Functions
+ ******************************************************************************/
+
+EmberString *estring_substring(EmberString *str, size_t start, size_t end)
+{
+    if(!str || !str->c_str)
     {
-        return 1;
+        error_val = EMBER_STRING_NULL_ARG;
+        return NULL;
     }
-    return 0;
+    if(end < start || end > str->len || start < 0)
+    {
+        error_val = EMBER_STRING_OUT_OF_BOUNDS;
+        return NULL;
+    }
+
+    EmberString *ret = malloc(sizeof(EmberString));
+    ret->len = end-start;
+    ret->c_str = malloc(sizeof(char)*ret->len);
+
+    for(size_t i = 0; i < ret->len; i++)
+    {
+        ret->c_str[i] = str->c_str[start+i];
+    }
+    ret->c_str[ret->len] = '\0';
+
+    return ret;
+}
+
+EmberString *estring_concat(EmberString *str, EmberString *other)
+{
+    if(str == NULL)
+    {
+        error_val = EMBER_STRING_NULL_ARG;
+        if(!other)
+        {
+            return create_estring_from_cstr("", 0);
+        }
+        return create_estring_from_cstr(other->c_str, other->len);
+    }
+    if(other == NULL)
+    {
+        error_val = EMBER_STRING_NULL_ARG;
+        return create_estring_from_cstr(str->c_str, str->len);
+    }
+
+    EmberString *result = malloc(sizeof(EmberString));
+    result->len = str->len + other->len;
+    result->c_str = malloc(sizeof(char) * (result->len + 1));
+
+    for(size_t i = 0; i < str->len; i++)
+    {
+        result->c_str[i] = str->c_str[i];
+    }
+    for(size_t i = str->len; i < other->len+str->len; i++)
+    {
+        result->c_str[i] = other->c_str[i-str->len];
+    }
+    result->c_str[result->len] = '\0';
+    return result;
 }
 
 EmberString *estring_strip(EmberString *str)
@@ -128,25 +211,6 @@ EmberString *estring_strip(EmberString *str)
     return str;
 }
 
-/*
- * This function takes advantage of the fact that in ASCII, a-z and A-Z are
- * always 32 values apart. This will NOT work for other character sets, but few
- * systems use anything other than ASCII and Unicode. This happens to work with
- * Unicode characters as well, but that is merely a happy accident of the spec.
- *
- * If compiling on a EBCDIC system or anything else that uses a different
- * default character encoding, you'll need to either chance this code or
- * re-encode all text.
- */
-static char lowercase(char c)
-{
-    if(c < 'A' || c > 'Z')
-    {
-        return c;
-    }
-    return (char) (c + 32);
-}
-
 int estring_compare(const EmberString *str, const EmberString *other)
 {
     size_t min_len = str->len < other->len ? str->len : other->len;
@@ -179,62 +243,4 @@ int estring_compare(const EmberString *str, const EmberString *other)
     }
 }
 
-EmberString *estring_concat(EmberString *str, EmberString *other)
-{
-    if(str == NULL)
-    {
-        error_val = EMBER_STRING_NULL_ARG;
-        if(!other)
-        {
-            return create_estring_from_cstr("", 0);
-        }
-        return create_estring_from_cstr(other->c_str, other->len);
-    }
-    if(other == NULL)
-    {
-        error_val = EMBER_STRING_NULL_ARG;
-        return create_estring_from_cstr(str->c_str, str->len);
-    }
 
-    EmberString *result = malloc(sizeof(EmberString));
-    result->len = str->len + other->len;
-    result->c_str = malloc(sizeof(char) * (result->len + 1));
-
-    for(size_t i = 0; i < str->len; i++)
-    {
-        result->c_str[i] = str->c_str[i];
-    }
-    for(size_t i = str->len; i < other->len+str->len; i++)
-    {
-        result->c_str[i] = other->c_str[i-str->len];
-    }
-    result->c_str[result->len] = '\0';
-    return result;
-}
-
-#include <stdio.h>
-EmberString *estring_substring(EmberString *str, size_t start, size_t end)
-{
-    if(!str || !str->c_str)
-    {
-        error_val = EMBER_STRING_NULL_ARG;
-        return NULL;
-    }
-    if(end < start || end > str->len || start < 0)
-    {
-        error_val = EMBER_STRING_OUT_OF_BOUNDS;
-        return NULL;
-    }
-
-    EmberString *ret = malloc(sizeof(EmberString));
-    ret->len = end-start;
-    ret->c_str = malloc(sizeof(char)*ret->len);
-
-    for(size_t i = 0; i < ret->len; i++)
-    {
-        ret->c_str[i] = str->c_str[start+i];
-    }
-    ret->c_str[ret->len] = '\0';
-
-    return ret;
-}
