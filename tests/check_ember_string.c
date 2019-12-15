@@ -249,6 +249,68 @@ START_TEST(test_ember_substring)
 }
 END_TEST
 
+START_TEST(test_ember_string_strip)
+{
+    EmberString *empty = create_estring_from_cstr("", 0);
+    EmberString *test1 = create_estring_from_cstr("\n \t\t\n \v\v\v TEST \n\v\v"
+                                                 "\t \t  ", 23);
+    EmberString *test2 = create_estring_from_cstr("\nTEST whitespace exists "
+                                                 "inside \t\v END\t\t", 39);
+    EmberString *test3 = create_estring_from_cstr("TEST 3", 6);
+
+    EmberString *test_str = estring_strip(test1);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    ck_assert_ptr_nonnull(test_str);
+    ck_assert_ptr_nonnull(test_str->c_str);
+    ck_assert_ptr_ne(test_str, test1);
+    ck_assert_ptr_ne(test_str->c_str, test1->c_str);
+    ck_assert_int_eq(test_str->len, 4);
+    ck_assert_str_eq(test_str->c_str, "TEST");
+    destroy_estring(test_str);
+
+    test_str = estring_strip(test2);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    ck_assert_ptr_nonnull(test_str);
+    ck_assert_ptr_nonnull(test_str->c_str);
+    ck_assert_ptr_ne(test_str, test2);
+    ck_assert_ptr_ne(test_str->c_str, test2->c_str);
+    ck_assert_int_eq(test_str->len, 36);
+    ck_assert_str_eq(test_str->c_str, "TEST whitespace exists inside \t\v END");
+    destroy_estring(test_str);
+
+    test_str = estring_strip(test3);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    ck_assert_ptr_nonnull(test_str);
+    ck_assert_ptr_nonnull(test_str->c_str);
+    ck_assert_ptr_ne(test_str, test3);
+    ck_assert_ptr_ne(test_str->c_str, test3->c_str);
+    ck_assert_int_eq(test_str->len, test3->len);
+    ck_assert_str_eq(test_str->c_str, "TEST 3");
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    destroy_estring(test_str);
+
+    test_str = estring_strip(empty);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    ck_assert_ptr_nonnull(test_str);
+    ck_assert_ptr_nonnull(test_str->c_str);
+    ck_assert_ptr_ne(test_str, empty);
+    ck_assert_ptr_ne(test_str->c_str, empty->c_str);
+    ck_assert_int_eq(test_str->len, 0);
+    ck_assert_str_eq(test_str->c_str, empty->c_str);
+    destroy_estring(test_str);
+
+    test_str = estring_strip(NULL);
+    ck_assert_ptr_null(test_str);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NULL_ARG);
+    clear_ember_string_error();
+
+    destroy_estring(test1);
+    destroy_estring(test2);
+    destroy_estring(test3);
+    destroy_estring(empty);
+}
+END_TEST
+
 Suite *ember_string_suite(void)
 {
     Suite *s;
@@ -262,6 +324,7 @@ Suite *ember_string_suite(void)
     tcase_add_test(tc_core, test_ember_string_from_cstr);
     tcase_add_test(tc_core, test_ember_string_concat);
     tcase_add_test(tc_core, test_ember_substring);
+    tcase_add_test(tc_core, test_ember_string_strip);
 
     suite_add_tcase(s, tc_core);
 

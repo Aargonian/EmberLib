@@ -154,61 +154,31 @@ EmberString *estring_concat(EmberString *str, EmberString *other)
     return result;
 }
 
+#include <stdio.h>
 EmberString *estring_strip(EmberString *str)
 {
     //Sanity check
-    if(!str || !str->c_str || str->len == 0)
+    if(!str || !str->c_str)
     {
-        return str;
+        error_val = EMBER_STRING_NULL_ARG;
+        return NULL;
     }
-    //Strip the left side
-    size_t lstrip_index = 0;
-    for(size_t index = 0; index < str->len; index++)
+    if(str->len == 0)
     {
-        if(is_whitespace(str->c_str[index]))
-        {
-            lstrip_index++;
-        }
-        else
-        {
-            break;
-        }
+        EmberString *ret = malloc(sizeof(EmberString));
+        ret->c_str = malloc(sizeof(char));
+        ret->c_str[0] = '\0';
+        ret->len = 0;
+        return ret;
     }
 
-    //Find right side strip index
-    size_t rstrip_index = str->len;
-    for(size_t index = str->len - 1; index >= 0; index--)
-    {
-        if(is_whitespace(str->c_str[index]))
-        {
-            rstrip_index--;
-        }
-        else
-        {
-            break;
-        }
-    }
+    size_t left = 0;
+    size_t right = str->len-1;
 
-    if(lstrip_index == rstrip_index)
-    {
-        free(str->c_str);
-        str->c_str = NULL;
-        str->len = 0;
-    }
-    else
-    {
-        size_t chop_off = lstrip_index + (str->len - rstrip_index);
-        char *new = malloc(sizeof(char) * (str->len - chop_off + 1));
-        for(size_t index = lstrip_index; index < rstrip_index; index++)
-        {
-            new[index - lstrip_index] = str->c_str[index];
-        }
-        new[rstrip_index - lstrip_index] = '\0';
-        free(str->c_str);
-        str->c_str = new;
-        str->len -= chop_off;
-    }
-    return str;
+    for(; left < str->len && is_whitespace(str->c_str[left]); left++);
+    for(; right > left && is_whitespace(str->c_str[right]); right--);
+
+    return estring_substring(str, left, right+1);
 }
 
 int estring_compare(const EmberString *str, const EmberString *other)
