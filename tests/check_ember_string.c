@@ -97,6 +97,7 @@ START_TEST(test_ember_string_concat)
     ck_assert_int_eq(result->len, str1->len+str2->len);
     ck_assert_str_eq(result->c_str, "String1String2");
     ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    destroy_estring(result);
 
     result = estring_concat(str2, str1);
     ck_assert_ptr_nonnull(result);
@@ -106,6 +107,7 @@ START_TEST(test_ember_string_concat)
     ck_assert_int_eq(result->len, str1->len+str2->len);
     ck_assert_str_eq(result->c_str, "String2String1");
     ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    destroy_estring(result);
 
     result = estring_concat(str1, empty);
     ck_assert_ptr_nonnull(result);
@@ -115,6 +117,7 @@ START_TEST(test_ember_string_concat)
     ck_assert_int_eq(result->len, str1->len);
     ck_assert_str_eq(result->c_str, "String1");
     ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    destroy_estring(result);
 
     result = estring_concat(str1, null_str);
     ck_assert_ptr_nonnull(result);
@@ -125,6 +128,7 @@ START_TEST(test_ember_string_concat)
     ck_assert_str_eq(result->c_str, "String1");
     ck_assert_int_eq(ember_string_error(), EMBER_STRING_NULL_ARG);
     clear_ember_string_error();
+    destroy_estring(result);
 
     result = estring_concat(null_str, str2);
     ck_assert_ptr_nonnull(result);
@@ -135,6 +139,7 @@ START_TEST(test_ember_string_concat)
     ck_assert_str_eq(result->c_str, "String2");
     ck_assert_int_eq(ember_string_error(), EMBER_STRING_NULL_ARG);
     clear_ember_string_error();
+    destroy_estring(result);
 
     result = estring_concat(null_str, null_str);
     ck_assert_ptr_nonnull(result);
@@ -143,6 +148,7 @@ START_TEST(test_ember_string_concat)
     ck_assert_str_eq(result->c_str, empty->c_str);
     ck_assert_int_eq(ember_string_error(), EMBER_STRING_NULL_ARG);
     clear_ember_string_error();
+    destroy_estring(result);
 
     result = estring_concat(empty, empty);
     ck_assert_ptr_nonnull(result);
@@ -160,6 +166,89 @@ START_TEST(test_ember_string_concat)
 }
 END_TEST
 
+START_TEST(test_ember_substring)
+{
+    EmberString *str = create_estring_from_cstr("TestString", 10);
+    EmberString *empty = create_estring_from_cstr("", 0);
+
+    /* Standard Substring Tests */
+    EmberString *test_str = estring_substring(str, 0, 4);
+    ck_assert_ptr_nonnull(test_str);
+    ck_assert_ptr_nonnull(test_str->c_str);
+    ck_assert_ptr_ne(test_str, str);
+    ck_assert_ptr_ne(test_str->c_str, str->c_str);
+    ck_assert_int_eq(test_str->len, 4);
+    ck_assert_str_eq(test_str->c_str, "Test");
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    destroy_estring(test_str);
+
+    test_str = estring_substring(str, 4, str->len);
+    ck_assert_ptr_nonnull(test_str);
+    ck_assert_ptr_nonnull(test_str->c_str);
+    ck_assert_ptr_ne(test_str, str);
+    ck_assert_ptr_ne(test_str->c_str, str->c_str);
+    ck_assert_int_eq(test_str->len, str->len-4);
+    ck_assert_str_eq(test_str->c_str, "String");
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    destroy_estring(test_str);
+
+    /*
+     * If the span of the indices happens to be the whole string, the effect
+     * should be the same as a copy.
+     */
+    test_str = estring_substring(str, 0, str->len);
+    ck_assert_ptr_nonnull(test_str);
+    ck_assert_ptr_nonnull(test_str->c_str);
+    ck_assert_ptr_ne(test_str, str);
+    ck_assert_ptr_ne(test_str->c_str, str->c_str);
+    ck_assert_int_eq(test_str->len, str->len);
+    ck_assert_str_eq(test_str->c_str, str->c_str);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    destroy_estring(test_str);
+
+    /*
+     * If both indices are the same, the result should be an empty string.
+     */
+    test_str = estring_substring(str, 0, 0);
+    ck_assert_ptr_nonnull(test_str);
+    ck_assert_ptr_nonnull(test_str->c_str);
+    ck_assert_ptr_ne(test_str, str);
+    ck_assert_ptr_ne(test_str->c_str, str->c_str);
+    ck_assert_int_eq(test_str->len, empty->len);
+    ck_assert_str_eq(test_str->c_str, empty->c_str);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    destroy_estring(test_str);
+
+    /*
+     * Taking a substring of the empty string is possible, if both indices are 0
+     */
+    test_str = estring_substring(empty, 0, 0);
+    ck_assert_ptr_nonnull(test_str);
+    ck_assert_ptr_nonnull(test_str->c_str);
+    ck_assert_ptr_ne(test_str, empty);
+    ck_assert_ptr_ne(test_str->c_str, empty->c_str);
+    ck_assert_int_eq(test_str->len, empty->len);
+    ck_assert_str_eq(test_str->c_str, empty->c_str);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NO_ERR);
+    destroy_estring(test_str);
+
+    /* NULL strings are never valid arguments */
+    test_str = estring_substring(NULL, 0, 0);
+    ck_assert_ptr_null(test_str);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_NULL_ARG);
+    clear_ember_string_error();
+
+    /* The ending index should always be within the bounds */
+    test_str = estring_substring(str, 0, str->len + 1);
+    ck_assert_ptr_null(test_str);
+    ck_assert_int_eq(ember_string_error(), EMBER_STRING_OUT_OF_BOUNDS);
+    clear_ember_string_error();
+
+    destroy_estring(str);
+    destroy_estring(empty);
+}
+END_TEST
+
 Suite *ember_string_suite(void)
 {
     Suite *s;
@@ -172,6 +261,8 @@ Suite *ember_string_suite(void)
 
     tcase_add_test(tc_core, test_ember_string_from_cstr);
     tcase_add_test(tc_core, test_ember_string_concat);
+    tcase_add_test(tc_core, test_ember_substring);
+
     suite_add_tcase(s, tc_core);
 
     return s;

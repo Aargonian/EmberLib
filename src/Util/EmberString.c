@@ -56,12 +56,8 @@ void destroy_estring(EmberString *str)
 {
     if(str)
     {
-        if(str->c_str)
-        {
-            free(str->c_str);
-            str->c_str = NULL;
-        }
-        str->c_str = 0;
+        free(str->c_str);
+        str->c_str = NULL;
     }
     free(str);
 }
@@ -75,7 +71,7 @@ static int is_whitespace(char c)
     return 0;
 }
 
-EmberString *strip_estring(EmberString *str)
+EmberString *estring_strip(EmberString *str)
 {
     //Sanity check
     if(!str || !str->c_str || str->len == 0)
@@ -151,7 +147,7 @@ static char lowercase(char c)
     return (char) (c + 32);
 }
 
-int compare_estring(const EmberString *str, const EmberString *other)
+int estring_compare(const EmberString *str, const EmberString *other)
 {
     size_t min_len = str->len < other->len ? str->len : other->len;
     for(size_t index = 0; index < min_len; index++)
@@ -183,7 +179,6 @@ int compare_estring(const EmberString *str, const EmberString *other)
     }
 }
 
-#include <stdio.h>
 EmberString *estring_concat(EmberString *str, EmberString *other)
 {
     if(str == NULL)
@@ -215,4 +210,31 @@ EmberString *estring_concat(EmberString *str, EmberString *other)
     }
     result->c_str[result->len] = '\0';
     return result;
+}
+
+#include <stdio.h>
+EmberString *estring_substring(EmberString *str, size_t start, size_t end)
+{
+    if(!str || !str->c_str)
+    {
+        error_val = EMBER_STRING_NULL_ARG;
+        return NULL;
+    }
+    if(end < start || end > str->len || start < 0)
+    {
+        error_val = EMBER_STRING_OUT_OF_BOUNDS;
+        return NULL;
+    }
+
+    EmberString *ret = malloc(sizeof(EmberString));
+    ret->len = end-start;
+    ret->c_str = malloc(sizeof(char)*ret->len);
+
+    for(size_t i = 0; i < ret->len; i++)
+    {
+        ret->c_str[i] = str->c_str[start+i];
+    }
+    ret->c_str[ret->len] = '\0';
+
+    return ret;
 }

@@ -1,5 +1,10 @@
 /*
  * Created by Aaron Gorodetzky on 12/10/2019
+ *
+ * EmberString is used to make using standard, ascii-based character arrays much
+ * easier to handle than just raw char *. The functions and structures
+ * defined here are not intended to be used for Unicode characters or any other
+ * character set.
  */
 
 #ifndef EMBERLIB_EMBERSTRING_H
@@ -7,17 +12,18 @@
 
 #include <stdlib.h>
 
-
-/**
- * EmberString is used to make using stanard, ascii-based character arrays much
- * easier to handle than just raw char *. This structure is not intended for use
- * with Unicode characters.
+/*
+ * EmberString definition.
  */
 typedef struct EmberString
 {
     char *c_str;
     size_t len;
 } EmberString;
+
+/*******************************************************************************
+ * Construction and Destruction Functions
+ ******************************************************************************/
 
 /**
  * Takes as input a standard C-style string and converts it to an EmberString.
@@ -36,39 +42,9 @@ EmberString *create_estring_from_cstr(const char *str, size_t max_len);
  */
 void destroy_estring(EmberString *str);
 
-/**
- * Creates a modified version of the original EmberString, with the
- * whitespace on the left and right-hand side of the string removed.
- * @param str The EmberString to strip whitespace from
- * @return A modified version of the input string with whitespaced trimmed.
- */
-EmberString *strip_estring(EmberString *str);
-
-/**
- * Compares two EmberStrings to determine correct alphabetical ordering.
- * @param str The first string to compare
- * @param other The other string to compare
- * @return -1 if the first argument is less than, 1 if greater, 0 if equal
- */
-int compare_estring(const EmberString *str, const EmberString *other);
-
-/**
- * Concatenates two EmberStrings into a new EmberString. If one or both strings
- * are NULL, ember_string_error will be set to EMBER_STRING_NULL_ARG. In the
- * case of null arguments, if only one string is null, it will return a new
- * EmberString that is essentially just the non-null string. If both strings are
- * NULL, it will return a valid, but empty, EmberString.
- *
- * @param str The first string to concatenate.
- * @param other The second string to concatenate.
- * @return A string that is the concatenation of both input strings.
- */
-EmberString *estring_concat(EmberString *str, EmberString *other);
-
-/*
- * Error Handling Stuff
- */
-
+/*******************************************************************************
+ * Error Handling Definitions and Functions
+ ******************************************************************************/
 /**
  * Simple enum defining the various errors that can be set by string functions.
  */
@@ -77,6 +53,7 @@ typedef enum EmberStringError {
     EMBER_STRING_NULL_ARG,
     EMBER_STRING_INVALID_LEN,
     EMBER_STRING_TRUNCATED,
+    EMBER_STRING_OUT_OF_BOUNDS,
 } EmberStringError;
 
 /**
@@ -91,4 +68,52 @@ EmberStringError ember_string_error(void);
  */
 void clear_ember_string_error(void);
 
+/*******************************************************************************
+ * Utility Functions
+ ******************************************************************************/
+
+/**
+ * Returns a substring of the passed string from inclusive start to exclusive
+ * end. If the end index is less than the start index, or either index is
+ * negative or exceeds the bounds of the array then a NULL ptr will be returned
+ * and ember_string_error will be set to EMBER_STRING_OUT_OF_BOUNDS. If the
+ * EmberString passed is NULL then it will also return a NULL ptr and set
+ * EMBER_STRING_NULL_ARG.
+ *
+ * @param str The string to create the substring from.
+ * @param start The (inclusive) start index of the substring.
+ * @param end The (exclusive) end index of the substring.
+ * @return A substring containing the same characters of the original string
+ *         from start to end, or NULL if an error is encountered.
+ */
+EmberString *estring_substring(EmberString *str, size_t start, size_t end);
 #endif //EMBERLIB_EMBERSTRING_H
+
+/**
+ * Concatenates two EmberStrings into a new EmberString. If one or both strings
+ * are NULL, ember_string_error will be set to EMBER_STRING_NULL_ARG. In the
+ * case of null arguments, if only one string is null, it will return a new
+ * EmberString that is essentially just the non-null string. If both strings are
+ * NULL, it will return a valid, but empty, EmberString.
+ *
+ * @param str The first string to concatenate.
+ * @param other The second string to concatenate.
+ * @return A string that is the concatenation of both input strings.
+ */
+EmberString *estring_concat(EmberString *str, EmberString *other);
+
+/**
+ * Creates a modified version of the original EmberString, with the
+ * whitespace on the left and right-hand side of the string removed.
+ * @param str The EmberString toember_substring strip whitespace from
+ * @return A modified version of the input string with whitespaced trimmed.
+ */
+EmberString *estring_strip(EmberString *str);
+
+/**
+ * Compares two EmberStrings to determine correct alphabetical ordering.
+ * @param str The first string to compare
+ * @param other The other string to compare
+ * @return -1 if the first argument is less than, 1 if greater, 0 if equal
+ */
+int estring_compare(const EmberString *str, const EmberString *other);
