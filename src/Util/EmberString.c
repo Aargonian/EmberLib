@@ -155,7 +155,7 @@ EmberString *estring_substring(const EmberString *str, size_t start, size_t end)
 
     EmberString *ret = malloc(sizeof(EmberString));
     ret->len = end - start;
-    ret->c_str = malloc(sizeof(char) * ret->len);
+    ret->c_str = malloc(sizeof(char) * ret->len + 1);
 
     for(size_t i = 0; i < ret->len; i++)
     {
@@ -220,7 +220,7 @@ EmberString *estring_strip(EmberString *str)
     for(; right > left && is_whitespace(str->c_str[right]); right--)
     {}
 
-    return estring_substring(str, left, right + 1);
+    return estring_substring(str, left, right + 1u);
 }
 
 int estring_compare_with_case(const EmberString *str, const EmberString *other)
