@@ -1,7 +1,7 @@
 /*
  * Created by Aaron Helton on 11/22/19
  */
-#include <EmberLib/arraylist_new.h>
+#include <EmberLib/Util/EmberList.h>
 #include "check_util.h"
 
 #include <stdlib.h>
@@ -11,14 +11,14 @@ START_TEST(test_arraylist_int_create_destroy)
 {
     size_t expected_size = sizeof(size_t) * 3 + sizeof(int);
     int *array = NULL;
-    array = init_arraylist(int);
+    array = emberlist_create(int);
     ck_assert_ptr_nonnull(array);
-    ck_assert_uint_eq(arraylist_length(array), 0);
-    ck_assert_uint_eq(arraylist_capacity(array), ARRAYLIST_DEFAULT_CAPACITY);
-    ck_assert_uint_eq(arraylist_memory_footprint(array), expected_size);
+    ck_assert_uint_eq(emberlist_length(array), 0);
+    ck_assert_uint_eq(emberlist_capacity(array), EMBERLIST_DEFAULT_CAPACITY);
+    ck_assert_uint_eq(emberlist_memory_footprint(array), expected_size);
     ck_assert_int_eq(array[0], 0);
 
-    destroy_arraylist(array);
+    emberlist_destroy(array);
     ck_assert_ptr_null(array);
 }
 
@@ -30,16 +30,16 @@ START_TEST(test_arraylist_int_create_capacity)
     size_t expected_size = sizeof(size_t) * 3 + sizeof(int) * capacity;
     int *array = NULL;
 
-    array = init_arraylist_with_capacity(int, capacity);
+    array = emberlist_create_with_capacity(int, capacity);
     ck_assert_ptr_nonnull(array);
-    ck_assert_uint_eq(arraylist_length(array), 0);
-    ck_assert_uint_eq(arraylist_capacity(array), capacity);
-    ck_assert_uint_eq(arraylist_memory_footprint(array), expected_size);
+    ck_assert_uint_eq(emberlist_length(array), 0);
+    ck_assert_uint_eq(emberlist_capacity(array), capacity);
+    ck_assert_uint_eq(emberlist_memory_footprint(array), expected_size);
 
     for(size_t i = 0; i < capacity; i++)
         ck_assert_int_eq(array[0], 0);
 
-    destroy_arraylist(array);
+    emberlist_destroy(array);
     ck_assert_ptr_null(array);
 }
 
@@ -50,14 +50,14 @@ START_TEST(test_arraylist_char_ptr_create_destroy)
     size_t expected_size = sizeof(size_t) * 3 + sizeof(char *);
     char **array = NULL;
 
-    array = init_arraylist(char *);
+    array = emberlist_create(char *);
     ck_assert_ptr_nonnull(array);
-    ck_assert_uint_eq(arraylist_length(array), 0);
-    ck_assert_uint_eq(arraylist_capacity(array), ARRAYLIST_DEFAULT_CAPACITY);
-    ck_assert_uint_eq(arraylist_memory_footprint(array), expected_size);
+    ck_assert_uint_eq(emberlist_length(array), 0);
+    ck_assert_uint_eq(emberlist_capacity(array), EMBERLIST_DEFAULT_CAPACITY);
+    ck_assert_uint_eq(emberlist_memory_footprint(array), expected_size);
     ck_assert_ptr_null(array[0]);
 
-    destroy_arraylist(array);
+    emberlist_destroy(array);
     ck_assert_ptr_null(array);
 }
 
@@ -69,18 +69,18 @@ START_TEST(test_arraylist_char_ptr_capacity_create_destroy)
     size_t expected_size = sizeof(size_t) * 3 + sizeof(char *) * capacity;
     char **array = NULL;
 
-    array = init_arraylist_with_capacity(char *, capacity);
+    array = emberlist_create_with_capacity(char *, capacity);
     ck_assert_ptr_nonnull(array);
-    ck_assert_uint_eq(arraylist_length(array), 0);
-    ck_assert_uint_eq(arraylist_capacity(array), capacity);
-    ck_assert_uint_eq(arraylist_memory_footprint(array), expected_size);
+    ck_assert_uint_eq(emberlist_length(array), 0);
+    ck_assert_uint_eq(emberlist_capacity(array), capacity);
+    ck_assert_uint_eq(emberlist_memory_footprint(array), expected_size);
 
     for(size_t i = 0; i < capacity; i++)
     {
         ck_assert_ptr_null(array[i]);
     }
 
-    destroy_arraylist(array);
+    emberlist_destroy(array);
     ck_assert_ptr_null(array);
 }
 
@@ -103,16 +103,16 @@ START_TEST(test_arraylist_struct_create_destroy)
      * works.
      */
     check_struct *array = NULL;
-    array = init_arraylist(check_struct);
+    array = emberlist_create(check_struct);
     ck_assert_ptr_nonnull(array);
-    ck_assert_uint_eq(arraylist_length(array), 0);
-    ck_assert_uint_eq(arraylist_capacity(array), 1);
-    ck_assert_uint_eq(arraylist_memory_footprint(array), expected_size);
+    ck_assert_uint_eq(emberlist_length(array), 0);
+    ck_assert_uint_eq(emberlist_capacity(array), 1);
+    ck_assert_uint_eq(emberlist_memory_footprint(array), expected_size);
 
     /* All members of the struct should be their equivalent of '0' */
     emberlib_ck_assert_test_struct_equal(array, &check);
 
-    destroy_arraylist(array);
+    emberlist_destroy(array);
     ck_assert_ptr_null(array);
 }
 
@@ -134,13 +134,13 @@ START_TEST(test_arraylist_struct_capacity_create_destroy)
     size_t expected_size = sizeof(size_t) * 3 + sizeof(test_struct) * capacity;
     test_struct *array = NULL;
 
-    array = init_arraylist_with_capacity(test_struct, capacity);
+    array = emberlist_create_with_capacity(test_struct, capacity);
     ck_assert_ptr_nonnull(array);
-    ck_assert_uint_eq(arraylist_length(array), 0);
-    ck_assert_uint_eq(arraylist_capacity(array), capacity);
-    ck_assert_uint_eq(arraylist_memory_footprint(array), expected_size);
+    ck_assert_uint_eq(emberlist_length(array), 0);
+    ck_assert_uint_eq(emberlist_capacity(array), capacity);
+    ck_assert_uint_eq(emberlist_memory_footprint(array), expected_size);
 
-    destroy_arraylist(array);
+    emberlist_destroy(array);
     ck_assert_ptr_null(array);
 }
 
@@ -159,32 +159,32 @@ START_TEST(test_arraylist_int_push)
     const size_t SINGLE_EXPECTED_3 = sizeof(size_t) * 3 + sizeof(int) * 4;
     const size_t MULTI_EXPECTED = sizeof(size_t) * 3 + sizeof(int) * 16;
 
-    array = init_arraylist(int);
+    array = emberlist_create(int);
 
-    arraylist_push(array, SINGLE_PUSH_TEST_VALUE);
-    ck_assert_int_eq(arraylist_length(array), 1);
-    ck_assert_int_eq(arraylist_capacity(array), 1);
-    ck_assert_int_eq(arraylist_memory_footprint(array), SINGLE_EXPECTED);
+    emberlist_push(array, SINGLE_PUSH_TEST_VALUE);
+    ck_assert_int_eq(emberlist_length(array), 1);
+    ck_assert_int_eq(emberlist_capacity(array), 1);
+    ck_assert_int_eq(emberlist_memory_footprint(array), SINGLE_EXPECTED);
 
-    arraylist_push(array, SINGLE_PUSH_TEST_VALUE_2);
-    ck_assert_int_eq(arraylist_length(array), 2);
-    ck_assert_int_eq(arraylist_capacity(array), 2);
-    ck_assert_int_eq(arraylist_memory_footprint(array), SINGLE_EXPECTED_2);
+    emberlist_push(array, SINGLE_PUSH_TEST_VALUE_2);
+    ck_assert_int_eq(emberlist_length(array), 2);
+    ck_assert_int_eq(emberlist_capacity(array), 2);
+    ck_assert_int_eq(emberlist_memory_footprint(array), SINGLE_EXPECTED_2);
 
-    arraylist_push(array, SINGLE_PUSH_TEST_VALUE_3);
-    ck_assert_int_eq(arraylist_length(array), 3);
-    ck_assert_int_eq(arraylist_capacity(array), 4);
-    ck_assert_int_eq(arraylist_memory_footprint(array), SINGLE_EXPECTED_3);
+    emberlist_push(array, SINGLE_PUSH_TEST_VALUE_3);
+    ck_assert_int_eq(emberlist_length(array), 3);
+    ck_assert_int_eq(emberlist_capacity(array), 4);
+    ck_assert_int_eq(emberlist_memory_footprint(array), SINGLE_EXPECTED_3);
 
     for(size_t i = 0; i < MULTI_PUSH_LEN; i++)
     {
-        arraylist_push(array, MULTI_PUSH_TEST_VALUES[i]);
+        emberlist_push(array, MULTI_PUSH_TEST_VALUES[i]);
     }
-    ck_assert_int_eq(arraylist_length(array), 9);
-    ck_assert_int_eq(arraylist_capacity(array), 16);
-    ck_assert_int_eq(arraylist_memory_footprint(array), MULTI_EXPECTED);
+    ck_assert_int_eq(emberlist_length(array), 9);
+    ck_assert_int_eq(emberlist_capacity(array), 16);
+    ck_assert_int_eq(emberlist_memory_footprint(array), MULTI_EXPECTED);
 
-    destroy_arraylist(array);
+    emberlist_destroy(array);
 }
 
 END_TEST
@@ -225,44 +225,44 @@ START_TEST(test_arraylist_str_push)
     size_t MULTI_PUSH_CAPACITY = 16;
     size_t MULTI_PUSH_EXPECTED = sizeof(size_t) * 3 + sizeof(char *) * 16;
 
-    char **string_list = init_arraylist(char *);
+    char **string_list = emberlist_create(char *);
 
-    arraylist_push(string_list, to_push[SINGLE_PUSH1_INDEX]);
-    ck_assert_int_eq(arraylist_length(string_list), SINGLE_PUSH1_LENGTH);
-    ck_assert_int_eq(arraylist_capacity(string_list), SINGLE_PUSH1_CAPACITY);
-    ck_assert_int_eq(arraylist_memory_footprint(string_list),
+    emberlist_push(string_list, to_push[SINGLE_PUSH1_INDEX]);
+    ck_assert_int_eq(emberlist_length(string_list), SINGLE_PUSH1_LENGTH);
+    ck_assert_int_eq(emberlist_capacity(string_list), SINGLE_PUSH1_CAPACITY);
+    ck_assert_int_eq(emberlist_memory_footprint(string_list),
                      SINGLE_PUSH1_EXPECTED);
     ck_assert_str_eq(arraylist_get(string_list, SINGLE_PUSH1_INDEX, NULL),
                      to_push[SINGLE_PUSH1_INDEX]);
 
-    arraylist_push(string_list, to_push[SINGLE_PUSH2_INDEX]);
-    ck_assert_int_eq(arraylist_length(string_list), SINGLE_PUSH2_LENGTH);
-    ck_assert_int_eq(arraylist_capacity(string_list), SINGLE_PUSH2_CAPACITY);
-    ck_assert_int_eq(arraylist_memory_footprint(string_list),
+    emberlist_push(string_list, to_push[SINGLE_PUSH2_INDEX]);
+    ck_assert_int_eq(emberlist_length(string_list), SINGLE_PUSH2_LENGTH);
+    ck_assert_int_eq(emberlist_capacity(string_list), SINGLE_PUSH2_CAPACITY);
+    ck_assert_int_eq(emberlist_memory_footprint(string_list),
                      SINGLE_PUSH2_EXPECTED);
     ck_assert_str_eq(arraylist_get(string_list, SINGLE_PUSH2_INDEX, NULL),
                      to_push[SINGLE_PUSH2_INDEX]);
 
-    arraylist_push(string_list, to_push[SINGLE_PUSH3_INDEX]);
-    ck_assert_int_eq(arraylist_length(string_list), SINGLE_PUSH3_LENGTH);
-    ck_assert_int_eq(arraylist_capacity(string_list), SINGLE_PUSH3_CAPACITY);
-    ck_assert_int_eq(arraylist_memory_footprint(string_list),
+    emberlist_push(string_list, to_push[SINGLE_PUSH3_INDEX]);
+    ck_assert_int_eq(emberlist_length(string_list), SINGLE_PUSH3_LENGTH);
+    ck_assert_int_eq(emberlist_capacity(string_list), SINGLE_PUSH3_CAPACITY);
+    ck_assert_int_eq(emberlist_memory_footprint(string_list),
                      SINGLE_PUSH3_EXPECTED);
     ck_assert_str_eq(arraylist_get(string_list, SINGLE_PUSH3_INDEX, NULL),
                      to_push[SINGLE_PUSH3_INDEX]);
 
     for(size_t i = MULTI_PUSH_START_INDEX; i < MULTI_PUSH_END_INDEX; i++)
     {
-        arraylist_push(string_list, to_push[i]);
+        emberlist_push(string_list, to_push[i]);
         ck_assert_str_eq(arraylist_get(string_list, i, NULL), to_push[i]);
     }
 
-    ck_assert_int_eq(arraylist_length(string_list), MULTI_PUSH_END_INDEX);
-    ck_assert_int_eq(arraylist_capacity(string_list), MULTI_PUSH_CAPACITY);
-    ck_assert_int_eq(arraylist_memory_footprint(string_list),
+    ck_assert_int_eq(emberlist_length(string_list), MULTI_PUSH_END_INDEX);
+    ck_assert_int_eq(emberlist_capacity(string_list), MULTI_PUSH_CAPACITY);
+    ck_assert_int_eq(emberlist_memory_footprint(string_list),
                      MULTI_PUSH_EXPECTED);
 
-    destroy_arraylist(string_list);
+    emberlist_destroy(string_list);
 }
 
 END_TEST
@@ -299,83 +299,83 @@ START_TEST(test_arraylist_struct_push)
     size_t MULTI_PUSH_CAPACITY = 16;
     size_t MULTI_PUSH_EXPECTED = sizeof(size_t) * 3 + sizeof(check_struct) * 16;
 
-    check_struct *struct_list = init_arraylist(check_struct);
+    check_struct *struct_list = emberlist_create(check_struct);
 
-    arraylist_push(struct_list, to_push[SINGLE_PUSH1_INDEX]);
-    ck_assert_int_eq(arraylist_length(struct_list), SINGLE_PUSH1_LENGTH);
-    ck_assert_int_eq(arraylist_capacity(struct_list), SINGLE_PUSH1_CAPACITY);
-    ck_assert_int_eq(arraylist_memory_footprint(struct_list),
+    emberlist_push(struct_list, to_push[SINGLE_PUSH1_INDEX]);
+    ck_assert_int_eq(emberlist_length(struct_list), SINGLE_PUSH1_LENGTH);
+    ck_assert_int_eq(emberlist_capacity(struct_list), SINGLE_PUSH1_CAPACITY);
+    ck_assert_int_eq(emberlist_memory_footprint(struct_list),
                      SINGLE_PUSH1_EXPECTED);
     emberlib_ck_assert_test_struct_equal(struct_list + SINGLE_PUSH1_INDEX,
                                          to_push + SINGLE_PUSH1_INDEX);
 
-    arraylist_push(struct_list, to_push[SINGLE_PUSH2_INDEX]);
-    ck_assert_int_eq(arraylist_length(struct_list), SINGLE_PUSH2_LENGTH);
-    ck_assert_int_eq(arraylist_capacity(struct_list), SINGLE_PUSH2_CAPACITY);
-    ck_assert_int_eq(arraylist_memory_footprint(struct_list),
+    emberlist_push(struct_list, to_push[SINGLE_PUSH2_INDEX]);
+    ck_assert_int_eq(emberlist_length(struct_list), SINGLE_PUSH2_LENGTH);
+    ck_assert_int_eq(emberlist_capacity(struct_list), SINGLE_PUSH2_CAPACITY);
+    ck_assert_int_eq(emberlist_memory_footprint(struct_list),
                      SINGLE_PUSH2_EXPECTED);
     emberlib_ck_assert_test_struct_equal(struct_list + SINGLE_PUSH2_INDEX,
                                          to_push + SINGLE_PUSH2_INDEX);
 
-    arraylist_push(struct_list, to_push[SINGLE_PUSH3_INDEX]);
-    ck_assert_int_eq(arraylist_length(struct_list), SINGLE_PUSH3_LENGTH);
-    ck_assert_int_eq(arraylist_capacity(struct_list), SINGLE_PUSH3_CAPACITY);
-    ck_assert_int_eq(arraylist_memory_footprint(struct_list),
+    emberlist_push(struct_list, to_push[SINGLE_PUSH3_INDEX]);
+    ck_assert_int_eq(emberlist_length(struct_list), SINGLE_PUSH3_LENGTH);
+    ck_assert_int_eq(emberlist_capacity(struct_list), SINGLE_PUSH3_CAPACITY);
+    ck_assert_int_eq(emberlist_memory_footprint(struct_list),
                      SINGLE_PUSH3_EXPECTED);
     emberlib_ck_assert_test_struct_equal(struct_list + SINGLE_PUSH3_INDEX,
                                          to_push + SINGLE_PUSH3_INDEX);
 
     for(size_t i = MULTI_PUSH_START_INDEX; i < MULTI_PUSH_END_INDEX; i++)
     {
-        arraylist_push(struct_list, to_push[i]);
+        emberlist_push(struct_list, to_push[i]);
         emberlib_ck_assert_test_struct_equal(struct_list + i, to_push + i);
     }
 
-    ck_assert_int_eq(arraylist_length(struct_list), MULTI_PUSH_END_INDEX);
-    ck_assert_int_eq(arraylist_capacity(struct_list), MULTI_PUSH_CAPACITY);
-    ck_assert_int_eq(arraylist_memory_footprint(struct_list),
+    ck_assert_int_eq(emberlist_length(struct_list), MULTI_PUSH_END_INDEX);
+    ck_assert_int_eq(emberlist_capacity(struct_list), MULTI_PUSH_CAPACITY);
+    ck_assert_int_eq(emberlist_memory_footprint(struct_list),
                      MULTI_PUSH_EXPECTED);
 
-    destroy_arraylist(struct_list);
+    emberlist_destroy(struct_list);
 }
 
 END_TEST
 
 START_TEST(test_arraylist_int_push_with_capacity)
 {
-    int *array = init_arraylist_with_capacity(int, 8);
+    int *array = emberlist_create_with_capacity(int, 8);
     size_t expected_empty_memory = sizeof(size_t) * 3 + sizeof(int) * 8;
     size_t expected_expanded_memory = sizeof(size_t) * 3 + sizeof(int) * 16;
 
-    ck_assert_int_eq(arraylist_length(array), 0);
-    ck_assert_int_eq(arraylist_capacity(array), 8);
-    ck_assert_int_eq(arraylist_memory_footprint(array), expected_empty_memory);
+    ck_assert_int_eq(emberlist_length(array), 0);
+    ck_assert_int_eq(emberlist_capacity(array), 8);
+    ck_assert_int_eq(emberlist_memory_footprint(array), expected_empty_memory);
 
-    arraylist_push(array, 1);
-    arraylist_push(array, 1);
-    arraylist_push(array, 1);
+    emberlist_push(array, 1);
+    emberlist_push(array, 1);
+    emberlist_push(array, 1);
 
-    ck_assert_int_eq(arraylist_length(array), 3);
-    ck_assert_int_eq(arraylist_capacity(array), 8);
-    ck_assert_int_eq(arraylist_memory_footprint(array), expected_empty_memory);
+    ck_assert_int_eq(emberlist_length(array), 3);
+    ck_assert_int_eq(emberlist_capacity(array), 8);
+    ck_assert_int_eq(emberlist_memory_footprint(array), expected_empty_memory);
 
-    arraylist_push(array, 2);
-    arraylist_push(array, 3);
-    arraylist_push(array, 4);
-    arraylist_push(array, 5);
-    arraylist_push(array, 6);
+    emberlist_push(array, 2);
+    emberlist_push(array, 3);
+    emberlist_push(array, 4);
+    emberlist_push(array, 5);
+    emberlist_push(array, 6);
 
-    ck_assert_int_eq(arraylist_length(array), 8);
-    ck_assert_int_eq(arraylist_capacity(array), 8);
-    ck_assert_int_eq(arraylist_memory_footprint(array), expected_empty_memory);
+    ck_assert_int_eq(emberlist_length(array), 8);
+    ck_assert_int_eq(emberlist_capacity(array), 8);
+    ck_assert_int_eq(emberlist_memory_footprint(array), expected_empty_memory);
 
-    arraylist_push(array, 9);
-    ck_assert_int_eq(arraylist_length(array), 9);
-    ck_assert_int_eq(arraylist_capacity(array), 16);
-    ck_assert_int_eq(arraylist_memory_footprint(array),
+    emberlist_push(array, 9);
+    ck_assert_int_eq(emberlist_length(array), 9);
+    ck_assert_int_eq(emberlist_capacity(array), 16);
+    ck_assert_int_eq(emberlist_memory_footprint(array),
                      expected_expanded_memory);
 
-    destroy_arraylist(array);
+    emberlist_destroy(array);
 }
 
 END_TEST
@@ -383,57 +383,57 @@ END_TEST
 START_TEST(test_arraylist_get)
 {
     int DEFAULT_VALUE = 0x7071996;
-    int *array = init_arraylist(int);
+    int *array = emberlist_create(int);
 
-    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(emberlist_err, 0);
 
     /* Negative values should not be accessible */
     int value = arraylist_get(array, -1, DEFAULT_VALUE);
     ck_assert_int_eq(value, DEFAULT_VALUE);
-    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
-    clear_arraylist_err();
+    ck_assert_int_eq(emberlist_err, EL_ERR_OUT_OF_BOUNDS);
+    clear_emberlist_err();
 
     /*
      * A new arraylist with no pushes should have no (valid) element at index 0
      */
     value = arraylist_get(array, 0, DEFAULT_VALUE);
     ck_assert_int_eq(value, DEFAULT_VALUE);
-    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
-    clear_arraylist_err();
+    ck_assert_int_eq(emberlist_err, EL_ERR_OUT_OF_BOUNDS);
+    clear_emberlist_err();
 
     /* Push an item, and slot 0 should no longer be invalid */
-    arraylist_push(array, 1);
+    emberlist_push(array, 1);
     value = arraylist_get(array, 0, DEFAULT_VALUE);
     ck_assert_int_eq(value, 1);
-    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(emberlist_err, 0);
 
     /* Although we have pushed something, slot 1 should still be an error. */
     value = arraylist_get(array, 1, DEFAULT_VALUE);
     ck_assert_int_eq(value, DEFAULT_VALUE);
-    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
-    clear_arraylist_err();
+    ck_assert_int_eq(emberlist_err, EL_ERR_OUT_OF_BOUNDS);
+    clear_emberlist_err();
 
     /* Push a second thing and slot 1 should now be filled */
-    arraylist_push(array, 2);
+    emberlist_push(array, 2);
     value = arraylist_get(array, 1, DEFAULT_VALUE);
     ck_assert_int_eq(value, 2);
-    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(emberlist_err, 0);
 
     /* Push another value to make sure our capacity is higher than length */
-    arraylist_push(array, 3);
+    emberlist_push(array, 3);
     value = arraylist_get(array, 2, DEFAULT_VALUE);
     ck_assert_int_eq(value, 3);
-    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(emberlist_err, 0);
 
     /* Although capacity should now be 4, index 3 should still be an error. */
-    ck_assert_int_eq(arraylist_length(array), 3);
-    ck_assert_int_eq(arraylist_capacity(array), 4);
+    ck_assert_int_eq(emberlist_length(array), 3);
+    ck_assert_int_eq(emberlist_capacity(array), 4);
     value = arraylist_get(array, 3, DEFAULT_VALUE);
     ck_assert_int_eq(value, DEFAULT_VALUE);
-    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
-    clear_arraylist_err();
+    ck_assert_int_eq(emberlist_err, EL_ERR_OUT_OF_BOUNDS);
+    clear_emberlist_err();
 
-    destroy_arraylist(array);
+    emberlist_destroy(array);
 }
 
 END_TEST
@@ -441,32 +441,32 @@ END_TEST
 START_TEST(test_arraylist_set)
 {
     int DEFAULT_VALUE = 0x7071996;
-    int *array = init_arraylist(int);
+    int *array = emberlist_create(int);
 
-    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(emberlist_err, 0);
 
     /* Should be unable to set a value at a negative index */
-    arraylist_set(array, -1, 5);
-    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
-    clear_arraylist_err();
+    emberlist_set(array, -1, 5);
+    ck_assert_int_eq(emberlist_err, EL_ERR_OUT_OF_BOUNDS);
+    clear_emberlist_err();
 
     /*
      * We should not be able to set a value at array index 0, even though it
      * technically exists under the hood.
      */
-    arraylist_set(array, 0, 10);
+    emberlist_set(array, 0, 10);
     ck_assert_int_eq(array[0], 0);
-    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
-    clear_arraylist_err();
+    ck_assert_int_eq(emberlist_err, EL_ERR_OUT_OF_BOUNDS);
+    clear_emberlist_err();
 
     /*
      * Push an element for us to be able to set, then confirm we can change it
      */
-    arraylist_push(array, 10);
+    emberlist_push(array, 10);
     ck_assert_int_eq(arraylist_get(array, 0, DEFAULT_VALUE), 10);
-    ck_assert_int_eq(arraylist_err, 0);
-    arraylist_set(array, 0, 17);
-    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(emberlist_err, 0);
+    emberlist_set(array, 0, 17);
+    ck_assert_int_eq(emberlist_err, 0);
     ck_assert_int_eq(arraylist_get(array, 0, DEFAULT_VALUE), 17);
 
     /*
@@ -477,29 +477,29 @@ START_TEST(test_arraylist_set)
      * value has been set, since it is conceivable by some chance that the
      * garbage data at index 1 happens to equal our test value.
      */
-    arraylist_set(array, 1, 17);
-    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
-    clear_arraylist_err();
+    emberlist_set(array, 1, 17);
+    ck_assert_int_eq(emberlist_err, EL_ERR_OUT_OF_BOUNDS);
+    clear_emberlist_err();
 
     /*
      * Push two more elements so we have a total length = 3, but capacity of 4.
      * We should still be unable to set index 3.
      */
-    arraylist_push(array, 11);
-    arraylist_push(array, 12);
-    ck_assert_int_eq(arraylist_length(array), 3);
-    ck_assert_int_eq(arraylist_capacity(array), 4);
+    emberlist_push(array, 11);
+    emberlist_push(array, 12);
+    ck_assert_int_eq(emberlist_length(array), 3);
+    ck_assert_int_eq(emberlist_capacity(array), 4);
 
     /* We should still be able to set index 2 */
-    arraylist_set(array, 2, 17);
-    ck_assert_int_eq(arraylist_err, 0);
+    emberlist_set(array, 2, 17);
+    ck_assert_int_eq(emberlist_err, 0);
     ck_assert_int_eq(arraylist_get(array, 2, DEFAULT_VALUE), 17);
 
     /* We should not be able to set index 3 */
-    arraylist_set(array, 3, 17);
-    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
+    emberlist_set(array, 3, 17);
+    ck_assert_int_eq(emberlist_err, EL_ERR_OUT_OF_BOUNDS);
 
-    destroy_arraylist(array);
+    emberlist_destroy(array);
 }
 
 END_TEST
@@ -508,12 +508,12 @@ START_TEST(test_arraylist_delete)
 {
     size_t EXPECTED_SIZE_AFTER_INIT = sizeof(size_t) * 3 + 16 * (sizeof(int));
     size_t EXPECTED_SIZE_AFTER_RESIZE = sizeof(size_t) * 3 + 8 * (sizeof(int));
-    int *array = init_arraylist(int);
+    int *array = emberlist_create(int);
     for(size_t i = 0; i < 9; i++)
-        arraylist_push(array, i);
-    ck_assert_int_eq(arraylist_length(array), 9);
-    ck_assert_int_eq(arraylist_capacity(array), 16);
-    ck_assert_int_eq(arraylist_memory_footprint(array),
+        emberlist_push(array, i);
+    ck_assert_int_eq(emberlist_length(array), 9);
+    ck_assert_int_eq(emberlist_capacity(array), 16);
+    ck_assert_int_eq(emberlist_memory_footprint(array),
                      EXPECTED_SIZE_AFTER_INIT);
 
     /***************************************************************************
@@ -521,72 +521,72 @@ START_TEST(test_arraylist_delete)
      **************************************************************************/
 
     /* Confirm we can't delete a negative index */
-    arraylist_delete(array, -1);
-    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
-    ck_assert_int_eq(arraylist_length(array), 9);
-    clear_arraylist_err();
+    emberlist_delete(array, -1);
+    ck_assert_int_eq(emberlist_err, EL_ERR_OUT_OF_BOUNDS);
+    ck_assert_int_eq(emberlist_length(array), 9);
+    clear_emberlist_err();
 
     /* Confirm we can't delete an element at a higher index */
-    arraylist_delete(array, arraylist_length(array));
-    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
-    ck_assert_int_eq(arraylist_length(array), 9);
-    clear_arraylist_err();
+    emberlist_delete(array, emberlist_length(array));
+    ck_assert_int_eq(emberlist_err, EL_ERR_OUT_OF_BOUNDS);
+    ck_assert_int_eq(emberlist_length(array), 9);
+    clear_emberlist_err();
 
     /***************************************************************************
      * Positive Tests
      **************************************************************************/
 
     /* Remove element 7 */
-    arraylist_delete(array, 7);
-    ck_assert_int_eq(arraylist_err, 0);
-    ck_assert_int_eq(arraylist_length(array), 8);
-    ck_assert_int_eq(arraylist_capacity(array), 16);
+    emberlist_delete(array, 7);
+    ck_assert_int_eq(emberlist_err, 0);
+    ck_assert_int_eq(emberlist_length(array), 8);
+    ck_assert_int_eq(emberlist_capacity(array), 16);
     ck_assert_int_eq(arraylist_get(array, 7, -1), 8);
 
     /* Remove element 0 */
-    arraylist_delete(array, 0);
-    ck_assert_int_eq(arraylist_err, 0);
-    ck_assert_int_eq(arraylist_length(array), 7);
-    ck_assert_int_eq(arraylist_capacity(array), 16);
+    emberlist_delete(array, 0);
+    ck_assert_int_eq(emberlist_err, 0);
+    ck_assert_int_eq(emberlist_length(array), 7);
+    ck_assert_int_eq(emberlist_capacity(array), 16);
     ck_assert_int_eq(arraylist_get(array, 0, -1), 1);
 
     /* Remove enough elements to get us down to a length of 5 */
     for(int i = 0; i < 2; i++)
     {
-        arraylist_delete(array, 0);
-        ck_assert_int_eq(arraylist_err, 0);
-        ck_assert_int_eq(arraylist_length(array), 7 - i - 1);
-        ck_assert_int_eq(arraylist_capacity(array), 16);
+        emberlist_delete(array, 0);
+        ck_assert_int_eq(emberlist_err, 0);
+        ck_assert_int_eq(emberlist_length(array), 7 - i - 1);
+        ck_assert_int_eq(emberlist_capacity(array), 16);
     }
-    ck_assert_int_eq(arraylist_err, 0);
+    ck_assert_int_eq(emberlist_err, 0);
     ck_assert_int_eq(arraylist_get(array, 0, -1), 3);
-    ck_assert_int_eq(arraylist_length(array), 5);
-    ck_assert_int_eq(arraylist_capacity(array), 16);
+    ck_assert_int_eq(emberlist_length(array), 5);
+    ck_assert_int_eq(emberlist_capacity(array), 16);
 
     /* Remove a final element */
-    arraylist_delete(array, 0);
-    ck_assert_int_eq(arraylist_err, 0);
+    emberlist_delete(array, 0);
+    ck_assert_int_eq(emberlist_err, 0);
     ck_assert_int_eq(arraylist_get(array, 0, -1), 4);
-    ck_assert_int_eq(arraylist_length(array), 4);
-    ck_assert_int_eq(arraylist_capacity(array), 8);
-    ck_assert_int_eq(arraylist_memory_footprint(array),
+    ck_assert_int_eq(emberlist_length(array), 4);
+    ck_assert_int_eq(emberlist_capacity(array), 8);
+    ck_assert_int_eq(emberlist_memory_footprint(array),
                      EXPECTED_SIZE_AFTER_RESIZE);
 
     /* Finally, make sure we can remove (pop) an element on the end */
-    arraylist_delete(array, 3);
-    ck_assert_int_eq(arraylist_err, 0);
+    emberlist_delete(array, 3);
+    ck_assert_int_eq(emberlist_err, 0);
     ck_assert_int_eq(arraylist_get(array, 2, -1), 6);
-    ck_assert_int_eq(arraylist_length(array), 3);
-    ck_assert_int_eq(arraylist_capacity(array), 8);
-    ck_assert_int_eq(arraylist_memory_footprint(array),
+    ck_assert_int_eq(emberlist_length(array), 3);
+    ck_assert_int_eq(emberlist_capacity(array), 8);
+    ck_assert_int_eq(emberlist_memory_footprint(array),
                      EXPECTED_SIZE_AFTER_RESIZE);
 
     /* Confirm that after the "pop" we can't still get index 3 */
     ck_assert_int_eq(arraylist_get(array, 3, -1), -1);
-    ck_assert_int_eq(arraylist_err, AL_ERR_OUT_OF_BOUNDS);
-    clear_arraylist_err();
+    ck_assert_int_eq(emberlist_err, EL_ERR_OUT_OF_BOUNDS);
+    clear_emberlist_err();
 
-    destroy_arraylist(array);
+    emberlist_destroy(array);
 }
 
 END_TEST

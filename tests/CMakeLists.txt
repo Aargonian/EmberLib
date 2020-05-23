@@ -9,7 +9,7 @@ if(${BUILD_TESTS})
     set(TEST_SOURCE check_util.c)
 
     set(ARRAYLIST_TEST_SOURCES ${TEST_HEADERS} ${TEST_SOURCE}
-                               check_arraylist_new.c)
+            check_emberlist.c)
 
     set(EMBER_STRING_TEST_SOURCES ${TEST_HEADERS} ${TEST_SOURCE}
                                   check_ember_string.c)
