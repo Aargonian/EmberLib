@@ -5,6 +5,7 @@
 #ifndef EMBERLIB_EMBERFILE_H
 #define EMBERLIB_EMBERFILE_H
 
+#include <EmberLib/Util/EmberDefines.h>
 #include <EmberLib/Util/EmberString.h>
 
 /*
@@ -27,19 +28,12 @@ typedef enum EmberFileMode {
     READ_AND_WRITE
 } EmberFileMode;
 
-/*
- * All files are considered to be opened in binary mode, so there is no need to
- * distinguish between binary/text. However, it must still be specified if the
- * file is for reading, writing, or both.
- *
- * This function will set the following errors under the following conditions:
- *     0. If there is insufficient memory to create the file object and handles,
- *        it will set EMBER_OUT_OF_MEMORY_ERR.
- *     1. If a File is opened as READ_ONLY, and the File DOES NOT EXIST, it will
- *        set the ember_io_err to EMBER_FILE_NOT_FOUND_ERR.
- *     2. If a File is opened as READ_ONLY, and the program does not have
- *        sufficient privileges, it will set EMBER_PERMISSION_ERR.
- */
+EmberFile *efile_open(EmberString *path, EmberFileMode mode, bool create);
+uint64 efile_read(EmberFile *file, void *buffer, uint64 buffer_len);
+//uint64 efile_write(EmberFile *file, void *buffer, uint64 buffer_size);
+//void efile_flush(EmberFile *file);
+void efile_close(EmberFile *file);
+bool efile_eof_reached(EmberFile *file);
 
 
 #endif //EMBERLIB_EMBERFILE_H
