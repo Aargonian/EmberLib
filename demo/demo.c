@@ -28,11 +28,11 @@ int main(void)
     } else {
         fprintf(stdout, "We got this data: \n");
     }
-    fprintf(stdout, "%s", text);
+    fprintf(stdout, "%s\n", text);
     free(text);
     efile_close(file);
 
     fprintf(stdout, "Additional Data Gathered: \n");
-    fprintf(stdout, "Total Data Read: %d Bytes\n", read);
+    fprintf(stdout, "Total Data Read: %ld Bytes\n", read);
     return 0;
 }
