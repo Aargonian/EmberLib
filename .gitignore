@@ -1,3 +1,4 @@
+.clangd/
 .idea/
 cmake-build-*/
 build/
