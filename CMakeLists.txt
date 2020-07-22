@@ -5,6 +5,9 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+# Export compile commands by default.
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
 # Note that testing requires libcheck to be installed on the system!
 # See the tests/CMakeLists.txt file for details.
 if(NOT DEFINED BUILD_TESTS)
@@ -53,4 +56,3 @@ if(${BUILD_TESTS})
 endif(${BUILD_TESTS})
 
 enable_testing()
-add_test(NAME check COMMAND check)
