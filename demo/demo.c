@@ -2,37 +2,45 @@
  * Created by Aaron Helton on 11/22/19
  */
 #include <EmberLib/Util/EmberList.h>
+#include <EmberLib/Util/BitArray.h>
 #include <EmberLib/IO/EmberFile.h>
 #include <stdio.h>
 
+void print_bitarray(BitArray *array)
+{
+    for(uint32 i = 0; i < ebitarray_size(array); i++)
+    {
+        printf("%d", ebitarray_get(array, i) ? 1 : 0);
+    }
+    printf("\n");
+}
+
 int main(void)
 {
-    EmberString *file_path = create_estring_from_cstr("./Test.txt", 1000);
-    EmberFile *file = efile_open(file_path, READ_ONLY, FALSE);
-    destroy_estring(file_path);
-    file_path = NULL;
+    BitArray *array = ebitarray_create(32);
+    printf("Current Array: ");
+    print_bitarray(array);
 
-    if(!file)
-    {
-        fprintf(stderr, "There was an issue opening the file!\n");
-        return -1;
-    }
+    ebitarray_set(array, 1, 1);
+    printf("After setting bit pos 1 to 1: ");
+    print_bitarray(array);
 
-    char *text = malloc(sizeof(char)*1000);
-    uint64 read = efile_read(file, text, 1000);
-    text[read] = '\0';
+    ebitarray_set(array, 1, 0);
+    printf("After setting bit pos 1 to 1: ");
+    print_bitarray(array);
 
-    if(!efile_eof_reached(file))
-    {
-        fprintf(stderr, "There was a lot more text than expected! We got this: \n");
-    } else {
-        fprintf(stdout, "We got this data: \n");
-    }
-    fprintf(stdout, "%s\n", text);
-    free(text);
-    efile_close(file);
+    ebitarray_set(array, 1, 20);
+    printf("After setting bit pos 1 to 20: ");
+    print_bitarray(array);
 
-    fprintf(stdout, "Additional Data Gathered: \n");
-    fprintf(stdout, "Total Data Read: %ld Bytes\n", read);
+    ebitarray_set_range(array, 10, 20, 1);
+    printf("After setting bits 10-20 to 1: ");
+    print_bitarray(array);
+
+    ebitarray_set_range(array, 10, 20, 0);
+    printf("After setting bits 10-20 to 0: ");
+    print_bitarray(array);
+
+    ebitarray_destroy(array);
     return 0;
 }

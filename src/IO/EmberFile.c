@@ -11,11 +11,11 @@ struct EmberGenericFile
     FILE *file;
     uint64 current_loc;
     uint64 file_size;
-    bool eof_reached;
+    ebool eof_reached;
 };
 
 /* TODO: Add proper error handling and checking */
-EmberFile *efile_open(EmberString *path, EmberFileMode mode, bool create)
+EmberFile *efile_open(EmberString *path, EmberFileMode mode, ebool create)
 {
     EmberFile *efile = malloc(sizeof(EmberFile));
     if(!efile)
@@ -73,7 +73,7 @@ uint64 efile_read(EmberFile *efile, void *buffer, uint64 buffer_size)
     return amount_read;
 }
 
-bool efile_eof_reached(EmberFile *file)
+ebool efile_eof_reached(EmberFile *file)
 {
     return file->eof_reached;
 }

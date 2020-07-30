@@ -7,6 +7,7 @@ set(headers ${CONFIG_HEADER}
 set(sources Util/EmberList.c
     Util/EmberString.c
     Util/EmberMath.c
+    Util/BitArray.c
     IO/EmberFile.c)
 
 add_library(EmberLib STATIC ${headers} ${sources})

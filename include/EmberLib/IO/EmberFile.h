@@ -28,12 +28,12 @@ typedef enum EmberFileMode {
     READ_AND_WRITE
 } EmberFileMode;
 
-EmberFile *efile_open(EmberString *path, EmberFileMode mode, bool create);
+EmberFile *efile_open(EmberString *path, EmberFileMode mode, ebool create);
 uint64 efile_read(EmberFile *file, void *buffer, uint64 buffer_len);
 //uint64 efile_write(EmberFile *file, void *buffer, uint64 buffer_size);
 //void efile_flush(EmberFile *file);
 void efile_close(EmberFile *file);
-bool efile_eof_reached(EmberFile *file);
+ebool efile_eof_reached(EmberFile *file);
 
 
 #endif //EMBERLIB_EMBERFILE_H
