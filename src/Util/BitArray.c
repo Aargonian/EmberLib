@@ -18,6 +18,10 @@ BitArray *ebitarray_create(uint32 size)
     BitArray *array = malloc(sizeof(BitArray));
     array->bits = size;
     array->data = malloc(sizeof(char) * (size/8));
+    for(uint32 i = 0; i < size/8; i++)
+    {
+        array->data[i] = 0;
+    }
     return array;
 }
 
