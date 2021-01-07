@@ -26,7 +26,7 @@ int main(void)
     print_bitarray(array);
 
     ebitarray_set(array, 1, 0);
-    printf("After setting bit pos 1 to 1: ");
+    printf("After setting bit pos 1 to 0: ");
     print_bitarray(array);
 
     ebitarray_set(array, 1, 20);
