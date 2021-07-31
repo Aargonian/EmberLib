@@ -4,8 +4,8 @@
 
 struct BitArrayImpl
 {
-    char *data;
-    uint32 bits;
+    unsigned char *data;
+    uint32 num_bits;
 };
 
 BitArray *ebitarray_create(uint32 size)
@@ -16,7 +16,7 @@ BitArray *ebitarray_create(uint32 size)
         size += 8 - (size % 8);
     }
     BitArray *array = malloc(sizeof(BitArray));
-    array->bits = size;
+    array->num_bits = size;
     array->data = malloc(sizeof(char) * (size/8));
     for(uint32 i = 0; i < size/8; i++)
     {
@@ -41,17 +41,17 @@ void ebitarray_destroy(BitArray *array)
 //TODO: Real error codes plz?
 int8 ebitarray_set_range(BitArray *array, uint32 start, uint32 end, ebool value)
 {
-    //TODO: Alter this for machines where bytes are != 8 bits
-    uint8 failure = 0;
-    if(end > array->bits) return -1;
-    if(!array) return -2;
-    while(!(start % 8 == 0) && start != end)
+    //TODO: Alter this for machines where bytes are != 8 num_bits
+    int8 failure = 0;
+    if(!array) return -1;
+    if(end > array->num_bits) return -2;
+    while(start % 8 != 0 && start <= end)
     {
-        if((failure = ebitarray_set(array, start++, value)))
-        {
+        failure = ebitarray_set(array, start++, value);
+        if(failure)
             return failure;
-        }
     }
+
     //Start is guaranteed to be byte aligned
     uint32 byte = start/8;
     uint8 byte_val = value ? 0xFFu : 0x00u;
@@ -60,7 +60,7 @@ int8 ebitarray_set_range(BitArray *array, uint32 start, uint32 end, ebool value)
         array->data[byte++] = byte_val;
         start+=8;
     }
-    while(start != end && !failure)
+    while(start <= end && !failure)
     {
         failure = ebitarray_set(array, start++, value);
     }
@@ -69,7 +69,7 @@ int8 ebitarray_set_range(BitArray *array, uint32 start, uint32 end, ebool value)
 
 int8 ebitarray_set(BitArray *array, uint32 index, ebool value)
 {
-    if(index >= array->bits) return -1;
+    if(index >= array->num_bits) return -1;
     uint32 byte = index/8;
     uint8 pos = index%8;
 
@@ -89,5 +89,5 @@ ebool ebitarray_get(BitArray *array, uint32 index)
 
 uint32 ebitarray_size(BitArray *array)
 {
-    return array->bits;
+    return array->num_bits;
 }
