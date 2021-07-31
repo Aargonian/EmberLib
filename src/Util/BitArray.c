@@ -47,14 +47,6 @@ void ebitarray_set_unsafe(BitArray *array, uint32 index, ebool bitval)
     uint32 byte = index >> 3; /* index/8 */
     uint8 pos = index & 0x07; /* index%8 */
     array->data[byte] ^= (-bitval ^ array->data[byte]) & (0x01u << pos);
-    /*
-     *  The above should be equivalent to the following code, but faster. It should also work equivalently on a one or two's compliment system
-     *  TODO: Benchmark the above code with the following and possibly change depending on compiler/system
-     *    if(value)
-     *        array->data[byte] |= (1u << pos);
-     *    else
-     *        array->data[byte] &= (0xFF - (1u << pos));
-     */
 }
 
 /*
