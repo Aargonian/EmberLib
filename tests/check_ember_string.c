@@ -2,8 +2,12 @@
  * Created by Aaron Helton on 11/22/19
  */
 #include <EmberLib/Util/EmberString.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <check.h>
+
+#define ck_assert_ptr_null(A) ck_assert_ptr_eq(A, NULL)
+#define ck_assert_ptr_nonnull(A) ck_assert_ptr_ne(A, NULL)
 
 START_TEST(test_ember_string_from_cstr)
 {
@@ -364,13 +368,14 @@ START_TEST(test_ember_string_compare)
     destroy_estring(test3);
     destroy_estring(empty);
 }
+END_TEST
 
 Suite *ember_string_suite(void)
 {
     Suite *s;
     TCase *tc_core;
 
-    s = suite_create("Arraylist_New");
+    s = suite_create("EmberString");
 
     /* Core Test Case */
     tc_core = tcase_create("Core");

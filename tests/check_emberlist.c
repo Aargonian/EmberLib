@@ -4,8 +4,12 @@
 #include <EmberLib/Util/EmberList.h>
 #include "check_util.h"
 
+#include <stddef.h>
 #include <stdlib.h>
 #include <check.h>
+
+#define ck_assert_ptr_nonnull(A) ck_assert_ptr_ne(A, NULL)
+#define ck_assert_ptr_null(A) ck_assert_ptr_eq(A, NULL)
 
 START_TEST(test_arraylist_int_create_destroy)
 {
@@ -596,7 +600,7 @@ Suite *arraylist_suite(void)
     Suite *s;
     TCase *tc_core;
 
-    s = suite_create("Arraylist_New");
+    s = suite_create("EmberList");
 
     /* Core Test Case */
     tc_core = tcase_create("Core");
